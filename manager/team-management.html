@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <header class="bg-purple-800 text-white py-6">
+    <div class="container mx-auto">
+      <h1 class="text-3xl font-bold">Team Management</h1>
+    </div>
+  </header>
+  <main class="container mx-auto mt-10">
+    <h2 class="text-xl font-semibold mb-4">Manage Your Team</h2>
+    <table class="w-full border border-gray-300">
+      <thead>
+        <tr>
+          <th class="border px-4 py-2">Name</th>
+          <th class="border px-4 py-2">Role</th>
+          <th class="border px-4 py-2">Performance</th>
+        </tr>
+      </thead>
+      <tbody id="teamTableBody">
+        <!-- Dynamic rows go here -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+  fetch('http://localhost:3000/Users')
+  .then(response => response.json())
+  .then(data => {
+    const tableBody = document.getElementById('teamTableBody');
+    tableBody.innerHTML = ''; // Clear old data
+
+    // Filter only Manager users
+    const managers = data.filter(user => user.Role === 'Manager');
+
+    managers.forEach(user => {
+      const row = `
+        <tr>
+          <td class="border px-4 py-2">${user.Username}</td>
+          <td class="border px-4 py-2">${user.Role}</td>
+          <td class="border px-4 py-2">N/A</td> <!-- Placeholder for performance -->
+        </tr>
+      `;
+      tableBody.innerHTML += row;
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching team data:', error);
+  });
+
+  </script>
+</body>
+</html>

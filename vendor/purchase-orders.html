@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <header class="bg-yellow-600 text-white py-6">
+    <div class="container mx-auto">
+      <h1 class="text-3xl font-bold">Purchase Orders</h1>
+    </div>
+  </header>
+
+  <main class="container mx-auto mt-10">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Purchase Orders</h2>
+    <table class="w-full bg-white shadow-md rounded-lg border-collapse">
+      <thead>
+        <tr>
+          <th class="border px-4 py-2">Order ID</th>
+          <th class="border px-4 py-2">Product Name</th>
+          <th class="border px-4 py-2">Quantity</th>
+          <th class="border px-4 py-2">Total Price</th>
+          <th class="border px-4 py-2">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">1001</td>
+          <td class="border px-4 py-2">Product A</td>
+          <td class="border px-4 py-2">10</td>
+          <td class="border px-4 py-2">$500</td>
+          <td class="border px-4 py-2">Shipped</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">1002</td>
+          <td class="border px-4 py-2">Product B</td>
+          <td class="border px-4 py-2">20</td>
+          <td class="border px-4 py-2">$1000</td>
+          <td class="border px-4 py-2">Pending</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+  <footer class="bg-gray-800 text-white py-6 mt-10">
+    <div class="container mx-auto text-center">
+      <p>© 2024 Vendor Management Dashboard. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

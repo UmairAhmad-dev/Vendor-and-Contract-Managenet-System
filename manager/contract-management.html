@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contract Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <header class="bg-green-800 text-white py-6">
+    <div class="container mx-auto">
+      <h1 class="text-3xl font-bold">Contract Management</h1>
+    </div>
+  </header>
+
+  <main class="container mx-auto mt-10">
+    <h2 class="text-xl font-semibold mb-4">Manage Contracts</h2>
+
+    <!-- Add New Contract Form -->
+    <div class="mb-6 p-4 border border-gray-300 bg-white shadow-md">
+      <h3 class="text-lg font-semibold mb-2">Add New Contract</h3>
+      <form id="add-contract-form">
+        <div class="mb-2">
+          <label class="block font-medium" for="new-contract-name">Contract Name</label>
+          <input type="text" id="new-contract-name" class="w-full border p-2" required />
+        </div>
+        <div class="mb-2">
+          <label class="block font-medium" for="new-contract-status">Status</label>
+          <input type="text" id="new-contract-status" class="w-full border p-2" required />
+        </div>
+        <div class="mb-2">
+          <label class="block font-medium" for="new-contract-vendor">Vendor</label>
+          <input type="text" id="new-contract-vendor" class="w-full border p-2" required />
+        </div>
+        <div class="mb-2">
+          <label class="block font-medium" for="new-contract-department">Department</label>
+          <input type="text" id="new-contract-department" class="w-full border p-2" required />
+        </div>
+        <button type="submit" class="bg-green-600 text-white px-4 py-2">Add Contract</button>
+      </form>
+    </div>
+
+    <!-- Contracts List -->
+    <ul id="contracts-list" class="list-disc pl-5"></ul>
+
+    <!-- Edit Form -->
+    <div id="edit-form" class="hidden mt-6 p-4 border border-gray-300 bg-white shadow-md">
+      <h3 class="text-lg font-semibold mb-2">Edit Contract</h3>
+      <form id="edit-contract-form">
+        <input type="hidden" id="contract-id" />
+        <div class="mb-2">
+          <label class="block font-medium" for="contract-name">Contract Name</label>
+          <input type="text" id="contract-name" class="w-full border p-2" required />
+        </div>
+        <div class="mb-2">
+          <label class="block font-medium" for="contract-status">Status</label>
+          <input type="text" id="contract-status" class="w-full border p-2" required />
+        </div>
+        <div class="mb-2">
+          <label class="block font-medium" for="contract-vendor">Vendor</label>
+          <input type="text" id="contract-vendor" class="w-full border p-2" required />
+        </div>
+        <div class="mb-2">
+          <label class="block font-medium" for="contract-department">Department</label>
+          <input type="text" id="contract-department" class="w-full border p-2" required />
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2">Update Contract</button>
+        <button type="button" class="bg-gray-400 text-white px-4 py-2" onclick="closeEditForm()">Cancel</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Fetch and display contracts
+    async function fetchContracts() {
+      try {
+        const response = await fetch('http://localhost:3000/contracts');
+        if (!response.ok) throw new Error('Failed to fetch contracts');
+        const contracts = await response.json();
+        const contractList = document.getElementById('contracts-list');
+        contractList.innerHTML = '';
+
+        contracts.forEach(contract => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            ${contract.ContractName} - <strong>${contract.Status}</strong> - Vendor: ${contract.VendorName} - Department: ${contract.DepartmentName}
+            <button onclick="editContract(${contract.ContractID}, '${contract.ContractName}', '${contract.Status}', '${contract.VendorName}', '${contract.DepartmentName}')" 
+                    class="bg-blue-500 text-white px-2 py-1 ml-4">Edit</button>
+          `;
+          contractList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Add new contract
+    document.getElementById('add-contract-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = document.getElementById('new-contract-name').value;
+      const status = document.getElementById('new-contract-status').value;
+      const vendor = document.getElementById('new-contract-vendor').value;
+      const department = document.getElementById('new-contract-department').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/contracts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ContractName: name, Status: status, VendorName: vendor, DepartmentName: department })
+        });
+
+        if (!response.ok) throw new Error('Failed to add contract');
+        alert('Contract added successfully');
+        document.getElementById('add-contract-form').reset();
+        fetchContracts();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to add contract');
+      }
+    });
+
+    // Edit contract
+    function editContract(id, name, status, vendor, department) {
+      document.getElementById('edit-form').classList.remove('hidden');
+      document.getElementById('contract-id').value = id;
+      document.getElementById('contract-name').value = name;
+      document.getElementById('contract-status').value = status;
+      document.getElementById('contract-vendor').value = vendor;
+      document.getElementById('contract-department').value = department;
+    }
+
+    // Close edit form
+    function closeEditForm() {
+      document.getElementById('edit-form').classList.add('hidden');
+    }
+
+    // Update contract
+    document.getElementById('edit-contract-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const id = document.getElementById('contract-id').value;
+      const name = document.getElementById('contract-name').value;
+      const status = document.getElementById('contract-status').value;
+      const vendor = document.getElementById('contract-vendor').value;
+      const department = document.getElementById('contract-department').value;
+
+      try {
+        const response = await fetch(`http://localhost:3000/contracts/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ContractName: name, Status: status, VendorName: vendor, DepartmentName: department })
+        });
+
+        if (!response.ok) throw new Error('Failed to update contract');
+        alert('Contract updated successfully');
+        fetchContracts();
+        closeEditForm();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update contract');
+      }
+    });
+
+    window.onload = fetchContracts;
+  </script>
+</body>
+</html>

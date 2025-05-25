@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <header class="bg-blue-800 text-white py-6">
+    <div class="container mx-auto">
+      <h1 class="text-3xl font-bold">Purchase Orders</h1>
+    </div>
+  </header>
+
+  <main class="container mx-auto mt-10">
+    <h2 class="text-xl font-semibold mb-4">Manage Purchase Orders</h2>
+    <div class="mb-6">
+      <input id="itemDetails" class="px-4 py-2 border" type="text" placeholder="Item Details" />
+      <input id="quantity" class="px-4 py-2 border" type="number" placeholder="Quantity" min="1" />
+      <input id="totalCost" class="px-4 py-2 border" type="number" step="0.01" placeholder="Total Cost" />
+      <select id="vendorID" class="px-4 py-2 border">
+        <option value="">Select Vendor</option>
+      </select>
+      <select id="contractID" class="px-4 py-2 border">
+        <option value="">Select Contract</option>
+      </select>
+      <select id="status" class="px-4 py-2 border">
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+      <button id="addOrder" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">Add Order</button>
+    </div>
+
+    <table id="purchaseOrdersTable" class="w-full border border-gray-300">
+      <thead>
+        <tr>
+          <th>POID</th>
+          <th>Vendor</th>
+          <th>Contract</th>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Cost</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+  <script>
+    $(function () {
+      const fetchData = (url, cb) => $.get(url, cb).fail(() => alert('Failed to fetch data'));
+
+      function loadOrders() {
+        fetchData('http://localhost:3000/purchaseOrders', (data) => {
+          const tbody = $('#purchaseOrdersTable tbody').empty();
+          data.forEach(order => {
+            tbody.append(`
+              <tr data-id="${order.POID}">
+                <td>${order.POID}</td>
+                <td>${order.VendorName || 'Unknown'}</td>
+                <td>${order.ContractName || 'Unknown'}</td>
+                <td>${order.ItemDetails || 'No details'}</td>
+                <td>${order.Quantity}</td>
+                <td>${order.TotalCost}</td>
+                <td>${order.Status}</td>
+                <td>
+                  <button class="bg-green-600 text-white px-2 py-1 editBtn">Edit</button>
+                  <button class="bg-red-600 text-white px-2 py-1 removeBtn">Remove</button>
+                </td>
+              </tr>
+            `);
+          });
+        });
+      }
+
+      function loadVendorsContracts() {
+        // Fetch vendors and populate the vendor dropdown
+        fetchData('http://localhost:3000/vendors', (vendors) => {
+          vendors.forEach(v => $('#vendorID').append(`<option value="${v.VendorID}">${v.Name}</option>`));
+        });
+
+        // Fetch contracts and populate the contract dropdown
+        fetchData('http://localhost:3000/contracts', (contracts) => {
+          contracts.forEach(c => $('#contractID').append(`<option value="${c.ContractID}">${c.ContractName}</option>`));
+        });
+      }
+
+      $('#addOrder').click(() => {
+        const orderData = {
+          ItemDetails: $('#itemDetails').val(),
+          Quantity: $('#quantity').val(),
+          TotalCost: $('#totalCost').val(),
+          VendorID: $('#vendorID').val(),
+          ContractID: $('#contractID').val(),
+          Status: $('#status').val()
+        };
+
+        if (Object.values(orderData).every(val => val)) {
+          $.post('http://localhost:3000/purchaseOrders', orderData, () => {
+            loadOrders();
+            $('input, select').val('');
+          }).fail(() => alert('Failed to add order'));
+        } else {
+          alert('Please fill in all fields');
+        }
+      });
+
+      $(document).on('click', '.editBtn', function () {
+        const row = $(this).closest('tr');
+        const poid = row.data('id');
+        $('#itemDetails').val(row.find('td:nth-child(4)').text());
+        $('#quantity').val(row.find('td:nth-child(5)').text());
+        $('#totalCost').val(row.find('td:nth-child(6)').text());
+        $('#status').val(row.find('td:nth-child(7)').text());
+        $('#addOrder').text('Update Order').off('click').click(() => {
+          $.ajax({
+            url: `http://localhost:3000/purchaseOrders/${poid}`,
+            method: 'PUT',
+            data: {
+              ItemDetails: $('#itemDetails').val(),
+              Quantity: $('#quantity').val(),
+              TotalCost: $('#totalCost').val(),
+              Status: $('#status').val()
+            },
+            success: () => {
+              loadOrders();
+              $('#addOrder').text('Add Order').off('click');
+              $('input, select').val('');
+            },
+            error: () => alert('Failed to update order')
+          });
+        });
+      });
+
+      $(document).on('click', '.removeBtn', function () {
+        if (confirm('Remove this order?')) {
+          const poid = $(this).closest('tr').data('id');
+          $.ajax({
+            url: `http://localhost:3000/purchaseOrders/${poid}`,
+            method: 'DELETE',
+            success: () => $(this).closest('tr').remove(),
+            error: () => alert('Failed to remove order')
+          });
+        }
+      });
+      function loadVendorsContracts() {
+  // Fetch vendors and populate the vendor dropdown
+  fetchData('http://localhost:3000/vendors', (vendors) => {
+    vendors.forEach(v => $('#vendorID').append(`<option value="${v.VendorID}">${v.Name}</option>`));
+  });
+
+  // Fetch contracts and populate the contract dropdown
+  fetchData('http://localhost:3000/contracts', (contracts) => {
+    contracts.forEach(c => $('#contractID').append(`<option value="${c.ContractID}">${c.ContractName}</option>`));
+  });
+}
+
+$('#addOrder').click(() => {
+  const orderData = {
+    ItemDetails: $('#itemDetails').val(),
+    Quantity: $('#quantity').val(),
+    TotalCost: $('#totalCost').val(),
+    VendorID: $('#vendorID').val(),
+    ContractID: $('#contractID').val(),
+    Status: $('#status').val()
+  };
+
+  if (Object.values(orderData).every(val => val)) {
+    $.ajax({
+      url: 'http://localhost:3000/purchaseOrders',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(orderData),
+      success: () => {
+        loadOrders();
+        $('input, select').val('');
+      },
+      error: () => alert('Failed to add order')
+    });
+  } else {
+    alert('Please fill in all fields');
+  }
+});
+
+
+      // Load the initial data
+      loadOrders();
+      loadVendorsContracts();
+    });
+  </script>
+</body>
+</html>

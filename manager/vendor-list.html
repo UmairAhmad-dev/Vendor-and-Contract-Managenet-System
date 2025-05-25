@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor List</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <header class="bg-blue-800 text-white py-6">
+    <div class="container mx-auto">
+      <h1 class="text-3xl font-bold">Vendor List</h1>
+    </div>
+  </header>
+
+  <!-- Add Vendor Form -->
+  <main class="container mx-auto mt-10">
+    <h2 class="text-xl font-semibold mb-4">Add New Vendor</h2>
+    <form id="addVendorForm" class="mb-6">
+      <div class="mb-4">
+        <label for="vendorName" class="block">Vendor Name:</label>
+        <input type="text" id="vendorName" class="border px-4 py-2 w-full" required>
+      </div>
+      <div class="mb-4">
+        <label for="contactInfo" class="block">Contact Info:</label>
+        <input type="text" id="contactInfo" class="border px-4 py-2 w-full">
+      </div>
+      <div class="mb-4">
+        <label for="serviceCategory" class="block">Service Category:</label>
+        <input type="text" id="serviceCategory" class="border px-4 py-2 w-full">
+      </div>
+      <div class="mb-4">
+        <label for="complianceCertification" class="block">Compliance Certification:</label>
+        <input type="checkbox" id="complianceCertification" class="mr-2"> Certified
+      </div>
+      <div class="mb-4">
+        <label for="performanceRating" class="block">Performance Rating (0-5):</label>
+        <input type="number" id="performanceRating" class="border px-4 py-2 w-full" min="0" max="5" step="0.01">
+      </div>
+      <div class="mb-4">
+        <label for="vendorStatus" class="block">Vendor Status:</label>
+        <select id="vendorStatus" class="border px-4 py-2 w-full">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Add Vendor</button>
+    </form>
+
+    <h2 class="text-xl font-semibold mb-4">Manage Vendors</h2>
+    <table id="vendorTable" class="w-full border border-gray-300">
+      <thead>
+        <tr>
+          <th class="border px-4 py-2">Vendor Name</th>
+          <th class="border px-4 py-2">Status</th>
+          <th class="border px-4 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Vendor rows will be inserted here dynamically -->
+      </tbody>
+    </table>
+  </main>
+
+  <!-- Update Vendor Modal -->
+  <div id="updateVendorModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white p-6 rounded-lg w-1/3">
+      <h3 class="text-xl font-semibold mb-4">Update Vendor</h3>
+      <label for="updateVendorName" class="block mb-2">Vendor Name:</label>
+      <input type="text" id="updateVendorName" class="border px-4 py-2 w-full mb-4">
+      <label for="updateVendorStatus" class="block mb-2">Vendor Status:</label>
+      <select id="updateVendorStatus" class="border px-4 py-2 w-full mb-4">
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+      <button id="saveVendorUpdate" class="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
+      <button id="closeModal" class="bg-gray-600 text-white px-4 py-2 rounded ml-2">Close</button>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      // Fetch vendors and display them in the table
+      function loadVendors() {
+        $.get('/vendors', function(data) {
+          const vendorTableBody = $('#vendorTable tbody');
+          vendorTableBody.empty();  // Clear the existing rows in the table
+
+          if (data.length === 0) {
+            vendorTableBody.append('<tr><td colspan="3" class="text-center py-4">No vendors available.</td></tr>');
+          } else {
+            data.forEach(function(vendor) {
+              const row = `
+                <tr data-id="${vendor.VendorID}">
+                  <td class="border px-4 py-2">${vendor.Name}</td>
+                  <td class="border px-4 py-2">${vendor.Status}</td>
+                  <td class="border px-4 py-2">
+                    <button class="bg-yellow-600 text-white px-2 py-1 rounded updateBtn">Update</button>
+                    <button class="bg-red-600 text-white px-2 py-1 rounded deleteBtn">Remove</button>
+                  </td>
+                </tr>
+              `;
+              vendorTableBody.append(row);
+            });
+          }
+        });
+      }
+
+      // Call the function to load vendors when the page loads
+      loadVendors();
+
+      // Add Vendor Form Submit
+      $('#addVendorForm').submit(function(e) {
+        e.preventDefault();
+
+        const newVendor = {
+          Name: $('#vendorName').val(),
+          ContactInfo: $('#contactInfo').val(),
+          ServiceCategory: $('#serviceCategory').val(),
+          ComplianceCertification: $('#complianceCertification').is(':checked'),
+          PerformanceRating: $('#performanceRating').val(),
+          Status: $('#vendorStatus').val()
+        };
+
+        // Check if required fields are empty
+        if (!newVendor.Name || !newVendor.Status) {
+          alert("Please fill in all required fields.");
+          return;
+        }
+
+        // Validate PerformanceRating (must be between 0 and 5)
+        if (newVendor.PerformanceRating < 0 || newVendor.PerformanceRating > 5) {
+          alert("Performance Rating must be between 0 and 5.");
+          return;
+        }
+
+        $.post('/vendors', newVendor, function(response) {
+          if (response.success) {
+            loadVendors();  // Reload the vendor list
+            $('#addVendorForm')[0].reset();  // Reset the form
+          } else {
+            alert('Failed to add vendor: ' + response.message);
+          }
+        }).fail(function(xhr, status, error) {
+          console.error("Error during POST request:", status, error);
+          alert('Error adding vendor: ' + error);
+        });
+      });
+
+      // Delete Vendor
+      $('#vendorTable').on('click', '.deleteBtn', function() {
+        const vendorID = $(this).closest('tr').data('id');
+        $.ajax({
+          url: `/vendors/${vendorID}`,
+          type: 'DELETE',
+          success: function(response) {
+            loadVendors();
+          },
+          error: function() {
+            alert('Error deleting vendor.');
+          }
+        });
+      });
+
+      // Update Vendor Modal Logic
+      $('#vendorTable').on('click', '.updateBtn', function() {
+        const vendorID = $(this).closest('tr').data('id');
+        const vendorName = $(this).closest('tr').find('td:first').text();
+        const vendorStatus = $(this).closest('tr').find('td:nth-child(2)').text();
+
+        $('#updateVendorName').val(vendorName);
+        $('#updateVendorStatus').val(vendorStatus);
+        $('#updateVendorModal').removeClass('hidden').data('vendorId', vendorID);
+      });
+
+      // Save Vendor Update
+      $('#saveVendorUpdate').click(function() {
+        const vendorID = $('#updateVendorModal').data('vendorId');
+        const updatedVendor = {
+          Name: $('#updateVendorName').val(),
+          Status: $('#updateVendorStatus').val()
+        };
+
+        $.ajax({
+          url: `/vendors/${vendorID}`,
+          type: 'PUT',
+          data: updatedVendor,
+          success: function(response) {
+            loadVendors();
+            $('#updateVendorModal').addClass('hidden');
+          },
+          error: function() {
+            alert('Error updating vendor.');
+          }
+        });
+      });
+
+      // Close Update Vendor Modal
+      $('#closeModal').click(function() {
+        $('#updateVendorModal').addClass('hidden');
+      });
+    });
+  </script>
+</body>
+</html>

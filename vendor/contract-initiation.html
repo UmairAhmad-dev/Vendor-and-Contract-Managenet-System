@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contract Initiation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-4">
+    <h1 class="text-center text-primary">Initiate New Contract</h1>
+
+    <form id="contractForm">
+      <div class="mb-3">
+        <label for="contractName" class="form-label">Contract Name</label>
+        <input type="text" class="form-control" id="contractName" required>
+      </div>
+      <div class="mb-3">
+        <label for="contractStartDate" class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="contractStartDate" required>
+      </div>
+      <div class="mb-3">
+        <label for="contractEndDate" class="form-label">End Date</label>
+        <input type="date" class="form-control" id="contractEndDate" required>
+      </div>
+      <div class="mb-3">
+        <label for="contractValue" class="form-label">Contract Value</label>
+        <input type="number" class="form-control" id="contractValue" required>
+      </div>
+      <button type="submit" class="btn btn-success w-100">Submit Contract</button>
+    </form>
+  </div>
+
+  <script>
+    // Handle Contract Form Submission
+    document.getElementById('contractForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('Contract Initiated Successfully!');
+    });
+
+    // Function to approve or reject contracts
+    function approveRejectContract(contractId, status) {
+      const data = {
+        contract_id: contractId,
+        status: status
+      };
+
+      fetch('http://localhost:3000/api/approve-reject-contract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  </script>
+
+  <!-- Approve or Reject Contract Buttons -->
+  <div class="container mt-4">
+    <button onclick="approveRejectContract(123, 'approved')" class="btn btn-success">Approve</button>
+    <button onclick="approveRejectContract(123, 'rejected')" class="btn btn-danger">Reject</button>
+  </div>
+</body>
+</html>

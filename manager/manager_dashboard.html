@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+  <style>
+    table {
+      border-collapse: collapse; /* merge borders */
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid black; /* border for every cell */
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+<body class="bg-gray-50 font-sans">
+  <!-- Navbar -->
+  <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-6 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">Manager Dashboard</h1>
+      <nav>
+        <a href="index.html" class="px-4 hover:underline">Home</a>
+        <a href="vendor-list.html" class="px-4 hover:underline">Vendors</a>
+        <a href="contract-management.html" class="px-4 hover:underline">Contracts</a>
+        <a href="budget-management.html" class="px-4 hover:underline">Budget</a>
+        <a href="generate-reports.html" class="px-4 hover:underline">Reports</a>
+        <a href="view-orders.html" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500">View Purchase Orders</a>
+        <a href="team-management.html" class="px-4 hover:underline">Team Management</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto mt-10 space-y-8">
+    <!-- Vendor Management Section -->
+    <section class="bg-blue-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-blue-800">Vendor Management</h2>
+        <p class="text-gray-600 mt-2">Manage vendors to ensure compliance and performance.</p>
+      </div>
+      <button 
+        class="bg-blue-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-700" 
+        onclick="window.location.href='vendor-list.html'">
+        Manage Vendors
+      </button>
+    </section>
+
+    <!-- Contract Management Section -->
+    <section class="bg-green-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-green-800">Contract Management</h2>
+        <p class="text-gray-600 mt-2">Oversee contracts to ensure smooth operations and renewals.</p>
+      </div>
+      <button 
+        class="bg-green-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-green-700" 
+        onclick="window.location.href='contract-management.html'">
+        Manage Contracts
+      </button>
+    </section>
+
+    <!-- Procurement & Budget Management Section -->
+    <section class="bg-yellow-50 rounded-lg p-6 shadow-md">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-semibold text-yellow-800">Procurement & Budget Management</h2>
+          <p class="text-gray-600 mt-2">Manage budgets and monitor purchase orders efficiently.</p>
+        </div>
+        <div class="space-x-4">
+          <button 
+            class="bg-yellow-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-yellow-500" 
+            onclick="window.location.href='budget-management.html'">
+            Manage Budget
+          </button>
+          <button 
+            class="bg-gray-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-gray-500" 
+            onclick="window.location.href='purchase-orders.html'">
+            View Orders
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reports Section -->
+    <section class="bg-indigo-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-indigo-800">Reports</h2>
+        <p class="text-gray-600 mt-2">Generate detailed reports for performance and compliance tracking.</p>
+      </div>
+      <button 
+        class="bg-indigo-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700" 
+        onclick="window.location.href='generate-report.html'">
+        Generate Reports
+      </button>
+    </section>
+
+    <!-- Team Management Section -->
+    <section class="bg-purple-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-purple-800">Team Management</h2>
+        <p class="text-gray-600 mt-2">Manage your team, assign roles, and track team performance.</p>
+      </div>
+      <button 
+        class="bg-purple-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-purple-700" 
+        onclick="window.location.href='team-management.html'">
+        Manage Team
+      </button>
+    </section>
+
+    <!-- Dynamic Data Section -->
+    <section class="mt-10">
+      <h2 class="text-3xl font-semibold text-gray-800 mb-4">View Data</h2>
+
+      <!-- Budgets Section -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-2xl font-semibold text-blue-800">Budgets</h3>
+        <button class="bg-blue-800 text-white py-2 px-6 rounded-lg mt-4" id="viewBudgets">View Budgets</button>
+        <div id="budgetsSection" class="mt-4"></div>
+      </div>
+
+      <!-- Departments Section -->
+      <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h3 class="text-2xl font-semibold text-green-800">Departments</h3>
+        <button class="bg-green-800 text-white py-2 px-6 rounded-lg mt-4" id="viewDepartments">View Departments</button>
+        <div id="departmentsSection" class="mt-4"></div>
+      </div>
+
+      <!-- Vendors Section -->
+      <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h3 class="text-2xl font-semibold text-indigo-800">Vendors</h3>
+        <button class="bg-indigo-800 text-white py-2 px-6 rounded-lg mt-4" id="viewVendors">View Vendors</button>
+        <div id="vendorsSection" class="mt-4"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6 mt-10">
+    <div class="container mx-auto text-center">
+      <p>© 2024 Manager Dashboard System. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+  $(document).ready(function() {
+
+    // Fetch Budgets
+    $('#viewBudgets').click(function() {
+      $.get('http://localhost:3000/budgets', function(data) {
+        let budgetsHtml = `
+          <table border="1">
+            <tr>
+              <th>Budget ID</th>
+              <th>Allocated</th>
+              <th>Spent</th>
+              <th>Remaining</th>
+            </tr>
+        `;
+        data.forEach(budget => {
+          budgetsHtml += `
+            <tr>
+              <td>${budget.BudgetID}</td>
+              <td>${budget.AllocatedAmount}</td>
+              <td>${budget.SpentAmount}</td>
+              <td>${budget.RemainingAmount}</td>
+            </tr>
+          `;
+        });
+        budgetsHtml += '</table>';
+        $('#budgetsSection').html(budgetsHtml);
+      });
+    });
+
+    // Fetch Departments
+    $('#viewDepartments').click(function() {
+      $.get('http://localhost:3000/departments', function(data) {
+        let departmentsHtml = `
+          <table border="1">
+            <tr>
+              <th>Department Name</th>
+              <th>Budget ID</th>
+            </tr>
+        `;
+        data.forEach(department => {
+          departmentsHtml += `
+            <tr>
+              <td>${department.Name}</td>
+              <td>${department.BudgetID}</td>
+            </tr>
+          `;
+        });
+        departmentsHtml += '</table>';
+        $('#departmentsSection').html(departmentsHtml);
+      });
+    });
+
+    // Fetch Vendors
+    $('#viewVendors').click(function() {
+      $.get('http://localhost:3000/vendors', function(data) {
+        let vendorsHtml = `
+          <table border="1">
+            <tr>
+              <th>Vendor Name</th>
+              <th>Service Category</th>
+              <th>Performance Rating</th>
+            </tr>
+        `;
+        data.forEach(vendor => {
+          vendorsHtml += `
+            <tr>
+              <td>${vendor.Name}</td>
+              <td>${vendor.ServiceCategory}</td>
+              <td>${vendor.PerformanceRating}</td>
+            </tr>
+          `;
+        });
+        vendorsHtml += '</table>';
+        $('#vendorsSection').html(vendorsHtml);
+      });
+    });
+
+  });
+</script>
+
+</body>
+</html>

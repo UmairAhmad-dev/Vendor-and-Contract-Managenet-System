@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <!-- Navbar -->
+  <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-6 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">Team Dashboard</h1>
+      <nav>
+        <a href="index.html" class="px-4 hover:underline">Home</a>
+        <a href="vendor-evaluation.html" class="px-4 hover:underline">Evaluate Vendors</a>
+        <a href="track-contracts.html" class="px-4 hover:underline">Track Contracts</a>
+        <a href="monitor-purchase-orders.html" class="px-4 hover:underline">Purchase Orders</a>
+        <a href="budget-monitoring.html" class="px-4 hover:underline">Budget Monitoring</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto mt-10 space-y-8">
+    <!-- Vendor Evaluation Section -->
+    <section class="bg-blue-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-blue-800">Vendor Evaluation</h2>
+        <p class="text-gray-600 mt-2">Evaluate vendor performance and provide ratings to ensure accountability and quality standards.</p>
+      </div>
+      <button 
+        class="bg-blue-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-700" 
+        onclick="window.location.href='vendor-evaluation.html'">
+        Evaluate Vendors
+      </button>
+    </section>
+
+    <!-- Contract Tracking Section -->
+    <section class="bg-green-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-green-800">Contract Tracking</h2>
+        <p class="text-gray-600 mt-2">Track the status of contracts and ensure timely renewals to maintain compliance.</p>
+      </div>
+      <button 
+        class="bg-green-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-green-700" 
+        onclick="window.location.href='track-contracts.html'">
+        Track Contracts
+      </button>
+    </section>
+
+    <!-- Purchase Orders Section -->
+    <section class="bg-yellow-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-yellow-800">Purchase Orders</h2>
+        <p class="text-gray-600 mt-2">Monitor and manage purchase orders to streamline procurement processes.</p>
+      </div>
+      <button 
+        class="bg-yellow-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-yellow-500" 
+        onclick="window.location.href='monitor-purchase-orders.html'">
+        Monitor Orders
+      </button>
+    </section>
+
+    <!-- Budget Monitoring Section -->
+    <section class="bg-indigo-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-indigo-800">Budget Monitoring</h2>
+        <p class="text-gray-600 mt-2">Stay within budget by monitoring expenditure and identifying discrepancies.</p>
+      </div>
+      <button 
+        class="bg-indigo-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700" 
+        onclick="window.location.href='budget-monitoring.html'">
+        Monitor Budget
+      </button>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6 mt-10">
+    <div class="container mx-auto text-center">
+      <p>© 2024 Team Dashboard. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

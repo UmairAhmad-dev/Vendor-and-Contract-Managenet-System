@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    async function fetchBudgets() {
+      try {
+        const response = await fetch('http://localhost:3000/budgets');
+        if (!response.ok) throw new Error('Failed to fetch budgets');
+        const budgets = await response.json();
+        const budgetList = document.getElementById('budgetList');
+        budgetList.innerHTML = budgets
+          .map(b => `<li>Budget ID: ${b.BudgetID}, Allocated: $${b.AllocatedAmount}, Spent: $${b.SpentAmount}</li>`)
+          .join('');
+      } catch (error) {
+        console.error(error);
+        alert('Error fetching budgets');
+      }
+    }
+
+    async function addBudget() {
+      const allocated = document.getElementById('allocated').value;
+      const spent = document.getElementById('spent').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/budgets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ AllocatedAmount: allocated, SpentAmount: spent })
+        });
+        if (!response.ok) throw new Error('Failed to add budget');
+        alert('Budget added successfully');
+        fetchBudgets();
+      } catch (error) {
+        console.error(error);
+        alert('Error adding budget');
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <header class="bg-yellow-600 text-white py-6">
+    <div class="container mx-auto">
+      <h1 class="text-3xl font-bold">Budget Management</h1>
+    </div>
+  </header>
+  <main class="container mx-auto mt-10">
+    <h2 class="text-xl font-semibold mb-4">Budget Overview</h2>
+    <p>Manage your budgets effectively and monitor expenses.</p>
+    <div class="bg-white shadow-md rounded-lg p-4 mt-4">
+      <h3 class="text-lg font-semibold">Add a New Budget</h3>
+      <label class="block text-gray-700 mt-2">Allocated Amount:</label>
+      <input id="allocated" type="number" class="border rounded px-2 py-1 w-full" />
+      <label class="block text-gray-700 mt-2">Spent Amount:</label>
+      <input id="spent" type="number" class="border rounded px-2 py-1 w-full" />
+      <button
+        class="bg-yellow-600 text-white px-4 py-2 rounded mt-3"
+        onclick="addBudget()"
+      >
+        Add Budget
+      </button>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-4 mt-4">
+      <h3 class="text-lg font-semibold">Existing Budgets</h3>
+      <ul id="budgetList" class="list-disc pl-5"></ul>
+    </div>
+  </main>
+  <script>
+    fetchBudgets();
+  </script>
+</body>
+</html>

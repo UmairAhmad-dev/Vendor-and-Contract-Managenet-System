@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Registration</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-4">
+    <h1 class="text-center text-primary">Vendor Registration</h1>
+
+    <form id="vendorRegistrationForm" class="mt-4">
+      <div class="mb-3">
+        <label for="companyName" class="form-label">Company Name</label>
+        <input type="text" class="form-control" id="companyName" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" class="form-control" id="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input type="tel" class="form-control" id="phone" pattern="^\+?[1-9]\d{1,14}$" required>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label">Company Address</label>
+        <textarea class="form-control" id="address" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="serviceType" class="form-label">Service Type</label>
+        <input type="text" class="form-control" id="serviceType" required>
+      </div>
+      <button type="submit" class="btn btn-success w-100">Register Vendor</button>
+    </form>
+
+    <p id="registrationMessage" class="mt-3 text-success d-none">Registration successful! You can now log in.</p>
+  </div>
+
+  <script>
+    // Handle Vendor Registration Form Submission
+    document.getElementById('vendorRegistrationForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = {
+        companyName: document.getElementById('companyName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        serviceType: document.getElementById('serviceType').value,
+      };
+
+      // Simulate server-side processing
+      alert('Vendor registered successfully!');
+      document.getElementById('registrationMessage').classList.remove('d-none');
+    });
+  </script>
+</body>
+</html>
+
+<script>
+  document.getElementById('vendorRegistrationForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = {
+      company_name: document.getElementById('companyName').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      address: document.getElementById('address').value,
+      service_type: document.getElementById('serviceType').value,
+    };
+
+    // Sending the form data to the backend
+    fetch('http://localhost:3000/api/register-vendor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+</script>
