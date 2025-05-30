@@ -122,6 +122,12 @@ app.get('/budgets', (req, res) => {
 //CREATE//
 app.post('/budgets', (req, res) => {
   const { AllocatedAmount, SpentAmount } = req.body;
+   const allocated = parseInt(AllocatedAmount);
+  const spent = parseInt(SpentAmount);
+
+  if (spent > allocated) {
+    return res.status(400).json({ error: 'Spent amount cannot exceed allocated amount.' });
+  }
   db.query(
     'INSERT INTO Budgets (AllocatedAmount, SpentAmount) VALUES (?, ?)',
     [AllocatedAmount, SpentAmount],
@@ -138,6 +144,12 @@ app.post('/budgets', (req, res) => {
 app.put('/budgets/:id', (req, res) => {
   const { id } = req.params;
   const { AllocatedAmount, SpentAmount } = req.body;
+  const allocated = parseInt(AllocatedAmount);
+  const spent = parseInt(SpentAmount);
+
+  if (spent > allocated) {
+    return res.status(400).json({ error: 'Spent amount cannot exceed allocated amount.' });
+  }
   db.query(
     'UPDATE Budgets SET AllocatedAmount = ?, SpentAmount = ? WHERE BudgetID = ?',
     [AllocatedAmount, SpentAmount, id],
@@ -172,23 +184,66 @@ app.get('/vendors', (req, res) => {
 });
 
 app.post('/vendors', (req, res) => {
-  const { Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating, Status } = req.body;
+  const { Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating} = req.body;
 
   // Validate required fields
-  if (!Name || !Status) {
-    return res.status(400).json({ success: false, message: 'Name and Status are required.' });
+  if (!Name ) {
+    return res.status(400).json({ success: false, message: 'Name is required.' });
   }
 
   const query = `
-    INSERT INTO Vendors (Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating, Status)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO Vendors (Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating)
+    VALUES (?, ?, ?, ?, ?)
   `;
 
-  db.query(query, [Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating, Status], (err, results) => {
+  db.query(query, [Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating], (err, results) => {
     if (err) {
       return res.status(500).json({ success: false, message: 'Failed to add vendor.', error: err.message });
     }
     res.status(200).json({ success: true, message: 'Vendor added successfully!', VendorID: results.insertId });
+  });
+});
+
+
+
+// Update Vendor
+app.put('/vendors/:id', (req, res) => {
+  const vendorId = req.params.id;
+  const { Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating } = req.body;
+
+  if (!Name) {
+    return res.status(400).json({ success: false, message: 'Name is required.' });
+  }
+
+  const query = `
+    UPDATE Vendors
+    SET Name = ?, ContactInfo = ?, ServiceCategory = ?, ComplianceCertification = ?, PerformanceRating = ?
+    WHERE VendorID = ?
+  `;
+
+  db.query(query, [Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating, vendorId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to update vendor.', error: err.message });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Vendor not found.' });
+    }
+    res.status(200).json({ success: true, message: 'Vendor updated successfully.' });
+  });
+});
+
+// Delete Vendor
+app.delete('/vendors/:id', (req, res) => {
+  const vendorId = req.params.id;
+
+  db.query('DELETE FROM Vendors WHERE VendorID = ?', [vendorId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to delete vendor.', error: err.message });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Vendor not found.' });
+    }
+    res.status(200).json({ success: true, message: 'Vendor deleted successfully.' });
   });
 });
 

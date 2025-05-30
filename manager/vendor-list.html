@@ -1,206 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vendor List</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vendor Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    let editVendorId = null;
+
+    async function fetchVendors() {
+      try {
+        const response = await fetch('http://localhost:3000/vendors');
+        if (!response.ok) throw new Error('Failed to fetch vendors');
+        const vendors = await response.json();
+
+        const vendorTable = document.getElementById('vendorTableBody');
+        vendorTable.innerHTML = vendors.map(v => `
+          <tr class="border-b">
+            <td class="px-4 py-2">${v.VendorID}</td>
+            <td class="px-4 py-2">${v.Name}</td>
+            <td class="px-4 py-2">${v.ContactInfo || 'N/A'}</td>
+            <td class="px-4 py-2">${v.ServiceCategory || 'N/A'}</td>
+            <td class="px-4 py-2">${v.ComplianceCertification}</td>
+            <td class="px-4 py-2">${v.PerformanceRating || 'N/A'}</td>
+            <td class="px-4 py-2 space-x-2">
+              <button onclick="editVendor(${v.VendorID}, '${v.Name}', '${v.ContactInfo || ''}', '${v.ServiceCategory || ''}', ${v.ComplianceCertification}, ${v.PerformanceRating || 0})" class="text-blue-600 hover:underline">Edit</button>
+              <button onclick="deleteVendor(${v.VendorID})" class="text-red-600 hover:underline">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error(error);
+        alert('Error fetching vendors');
+      }
+    }
+
+    async function addVendor() {
+      const Name = document.getElementById('name').value.trim();
+      const ContactInfo = document.getElementById('contact').value.trim();
+      const ServiceCategory = document.getElementById('category').value.trim();
+      const ComplianceCertification = parseInt(document.getElementById('certification').value);
+      const PerformanceRating = parseFloat(document.getElementById('rating').value);
+
+      if (!Name) {
+        alert("Name is required.");
+        return;
+      }
+
+      const vendorData = { Name, ContactInfo, ServiceCategory, ComplianceCertification, PerformanceRating };
+
+      try {
+        const url = editVendorId ? `http://localhost:3000/vendors/${editVendorId}` : 'http://localhost:3000/vendors';
+        const method = editVendorId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(vendorData)
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Operation failed');
+
+        alert(editVendorId ? 'Vendor updated successfully' : 'Vendor added successfully');
+        document.getElementById('vendorForm').reset();
+        editVendorId = null;
+        fetchVendors();
+      } catch (error) {
+        console.error(error);
+        alert('Error saving vendor: ' + error.message);
+      }
+    }
+
+    function editVendor(id, name, contact, category, certification, rating) {
+      editVendorId = id;
+      document.getElementById('name').value = name;
+      document.getElementById('contact').value = contact;
+      document.getElementById('category').value = category;
+      document.getElementById('certification').value = certification;
+      document.getElementById('rating').value = rating;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteVendor(id) {
+      if (!confirm("Are you sure you want to delete this vendor?")) return;
+      try {
+        const response = await fetch(`http://localhost:3000/vendors/${id}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Delete failed');
+        alert('Vendor deleted successfully');
+        fetchVendors();
+      } catch (error) {
+        console.error(error);
+        alert('Error deleting vendor: ' + error.message);
+      }
+    }
+
+    window.onload = fetchVendors;
+  </script>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-100 font-sans">
   <header class="bg-blue-800 text-white py-6">
     <div class="container mx-auto">
-      <h1 class="text-3xl font-bold">Vendor List</h1>
+      <h1 class="text-3xl font-bold">Vendor Management</h1>
     </div>
   </header>
 
-  <!-- Add Vendor Form -->
   <main class="container mx-auto mt-10">
-    <h2 class="text-xl font-semibold mb-4">Add New Vendor</h2>
-    <form id="addVendorForm" class="mb-6">
-      <div class="mb-4">
-        <label for="vendorName" class="block">Vendor Name:</label>
-        <input type="text" id="vendorName" class="border px-4 py-2 w-full" required>
-      </div>
-      <div class="mb-4">
-        <label for="contactInfo" class="block">Contact Info:</label>
-        <input type="text" id="contactInfo" class="border px-4 py-2 w-full">
-      </div>
-      <div class="mb-4">
-        <label for="serviceCategory" class="block">Service Category:</label>
-        <input type="text" id="serviceCategory" class="border px-4 py-2 w-full">
-      </div>
-      <div class="mb-4">
-        <label for="complianceCertification" class="block">Compliance Certification:</label>
-        <input type="checkbox" id="complianceCertification" class="mr-2"> Certified
-      </div>
-      <div class="mb-4">
-        <label for="performanceRating" class="block">Performance Rating (0-5):</label>
-        <input type="number" id="performanceRating" class="border px-4 py-2 w-full" min="0" max="5" step="0.01">
-      </div>
-      <div class="mb-4">
-        <label for="vendorStatus" class="block">Vendor Status:</label>
-        <select id="vendorStatus" class="border px-4 py-2 w-full">
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
+    <section class="bg-white shadow-md rounded-lg p-6 mb-8">
+      <h2 class="text-xl font-semibold text-blue-800 mb-4">Add / Update Vendor</h2>
+      <form id="vendorForm" onsubmit="event.preventDefault(); addVendor();">
+        <label class="block mt-2 text-gray-700">Name*:</label>
+        <input id="name" type="text" class="border rounded px-2 py-1 w-full" required />
+
+        <label class="block mt-2 text-gray-700">Contact Info:</label>
+        <input id="contact" type="text" class="border rounded px-2 py-1 w-full" />
+
+        <label class="block mt-2 text-gray-700">Service Category:</label>
+        <input id="category" type="text" class="border rounded px-2 py-1 w-full" />
+
+        <label class="block mt-2 text-gray-700">Compliance Certification:</label>
+        <select id="certification" class="border rounded px-2 py-1 w-full">
+          <option value="1">1 (Certified)</option>
+          <option value="0">0 (Not Certified)</option>
         </select>
+
+        <label class="block mt-2 text-gray-700">Performance Rating (1-5):</label>
+        <input id="rating" type="number" min="0" max="5" step="0.1" class="border rounded px-2 py-1 w-full" />
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded mt-4 hover:bg-blue-700" type="submit">
+          Save Vendor
+        </button>
+      </form>
+    </section>
+
+    <section class="bg-white shadow-md rounded-lg p-6">
+      <h2 class="text-xl font-semibold text-blue-800 mb-4">Existing Vendors</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead>
+            <tr class="bg-blue-100 text-left">
+              <th class="px-4 py-2">ID</th>
+              <th class="px-4 py-2">Name</th>
+              <th class="px-4 py-2">Contact</th>
+              <th class="px-4 py-2">Service</th>
+              <th class="px-4 py-2">Certified</th>
+              <th class="px-4 py-2">Rating</th>
+              <th class="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="vendorTableBody" class="text-gray-700">
+            <!-- JS inserts rows here -->
+          </tbody>
+        </table>
       </div>
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Add Vendor</button>
-    </form>
-
-    <h2 class="text-xl font-semibold mb-4">Manage Vendors</h2>
-    <table id="vendorTable" class="w-full border border-gray-300">
-      <thead>
-        <tr>
-          <th class="border px-4 py-2">Vendor Name</th>
-          <th class="border px-4 py-2">Status</th>
-          <th class="border px-4 py-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Vendor rows will be inserted here dynamically -->
-      </tbody>
-    </table>
+    </section>
   </main>
-
-  <!-- Update Vendor Modal -->
-  <div id="updateVendorModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
-    <div class="bg-white p-6 rounded-lg w-1/3">
-      <h3 class="text-xl font-semibold mb-4">Update Vendor</h3>
-      <label for="updateVendorName" class="block mb-2">Vendor Name:</label>
-      <input type="text" id="updateVendorName" class="border px-4 py-2 w-full mb-4">
-      <label for="updateVendorStatus" class="block mb-2">Vendor Status:</label>
-      <select id="updateVendorStatus" class="border px-4 py-2 w-full mb-4">
-        <option value="Active">Active</option>
-        <option value="Inactive">Inactive</option>
-      </select>
-      <button id="saveVendorUpdate" class="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
-      <button id="closeModal" class="bg-gray-600 text-white px-4 py-2 rounded ml-2">Close</button>
-    </div>
-  </div>
-
-  <script>
-    $(document).ready(function() {
-      // Fetch vendors and display them in the table
-      function loadVendors() {
-        $.get('/vendors', function(data) {
-          const vendorTableBody = $('#vendorTable tbody');
-          vendorTableBody.empty();  // Clear the existing rows in the table
-
-          if (data.length === 0) {
-            vendorTableBody.append('<tr><td colspan="3" class="text-center py-4">No vendors available.</td></tr>');
-          } else {
-            data.forEach(function(vendor) {
-              const row = `
-                <tr data-id="${vendor.VendorID}">
-                  <td class="border px-4 py-2">${vendor.Name}</td>
-                  <td class="border px-4 py-2">${vendor.Status}</td>
-                  <td class="border px-4 py-2">
-                    <button class="bg-yellow-600 text-white px-2 py-1 rounded updateBtn">Update</button>
-                    <button class="bg-red-600 text-white px-2 py-1 rounded deleteBtn">Remove</button>
-                  </td>
-                </tr>
-              `;
-              vendorTableBody.append(row);
-            });
-          }
-        });
-      }
-
-      // Call the function to load vendors when the page loads
-      loadVendors();
-
-      // Add Vendor Form Submit
-      $('#addVendorForm').submit(function(e) {
-        e.preventDefault();
-
-        const newVendor = {
-          Name: $('#vendorName').val(),
-          ContactInfo: $('#contactInfo').val(),
-          ServiceCategory: $('#serviceCategory').val(),
-          ComplianceCertification: $('#complianceCertification').is(':checked'),
-          PerformanceRating: $('#performanceRating').val(),
-          Status: $('#vendorStatus').val()
-        };
-
-        // Check if required fields are empty
-        if (!newVendor.Name || !newVendor.Status) {
-          alert("Please fill in all required fields.");
-          return;
-        }
-
-        // Validate PerformanceRating (must be between 0 and 5)
-        if (newVendor.PerformanceRating < 0 || newVendor.PerformanceRating > 5) {
-          alert("Performance Rating must be between 0 and 5.");
-          return;
-        }
-
-        $.post('/vendors', newVendor, function(response) {
-          if (response.success) {
-            loadVendors();  // Reload the vendor list
-            $('#addVendorForm')[0].reset();  // Reset the form
-          } else {
-            alert('Failed to add vendor: ' + response.message);
-          }
-        }).fail(function(xhr, status, error) {
-          console.error("Error during POST request:", status, error);
-          alert('Error adding vendor: ' + error);
-        });
-      });
-
-      // Delete Vendor
-      $('#vendorTable').on('click', '.deleteBtn', function() {
-        const vendorID = $(this).closest('tr').data('id');
-        $.ajax({
-          url: `/vendors/${vendorID}`,
-          type: 'DELETE',
-          success: function(response) {
-            loadVendors();
-          },
-          error: function() {
-            alert('Error deleting vendor.');
-          }
-        });
-      });
-
-      // Update Vendor Modal Logic
-      $('#vendorTable').on('click', '.updateBtn', function() {
-        const vendorID = $(this).closest('tr').data('id');
-        const vendorName = $(this).closest('tr').find('td:first').text();
-        const vendorStatus = $(this).closest('tr').find('td:nth-child(2)').text();
-
-        $('#updateVendorName').val(vendorName);
-        $('#updateVendorStatus').val(vendorStatus);
-        $('#updateVendorModal').removeClass('hidden').data('vendorId', vendorID);
-      });
-
-      // Save Vendor Update
-      $('#saveVendorUpdate').click(function() {
-        const vendorID = $('#updateVendorModal').data('vendorId');
-        const updatedVendor = {
-          Name: $('#updateVendorName').val(),
-          Status: $('#updateVendorStatus').val()
-        };
-
-        $.ajax({
-          url: `/vendors/${vendorID}`,
-          type: 'PUT',
-          data: updatedVendor,
-          success: function(response) {
-            loadVendors();
-            $('#updateVendorModal').addClass('hidden');
-          },
-          error: function() {
-            alert('Error updating vendor.');
-          }
-        });
-      });
-
-      // Close Update Vendor Modal
-      $('#closeModal').click(function() {
-        $('#updateVendorModal').addClass('hidden');
-      });
-    });
-  </script>
 </body>
 </html>

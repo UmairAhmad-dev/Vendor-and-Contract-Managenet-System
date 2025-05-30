@@ -40,6 +40,8 @@
       const id = document.getElementById('budgetId').value;
       const allocated = document.getElementById('allocated').value;
       const spent = document.getElementById('spent').value;
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = '';
 
       const method = id ? 'PUT' : 'POST';
       const url = id ? `http://localhost:3000/budgets/${id}` : 'http://localhost:3000/budgets';
@@ -51,14 +53,21 @@
           body: JSON.stringify({ AllocatedAmount: allocated, SpentAmount: spent })
         });
 
-        if (!response.ok) throw new Error('Failed to submit budget');
+        const data = await response.json();
+
+        if (!response.ok) {
+          errorMsg.textContent = data.error || 'Failed to submit budget';
+          return;
+        }
+
         alert(id ? 'Budget updated successfully' : 'Budget added successfully');
         document.getElementById('budgetForm').reset();
+        errorMsg.textContent = '';
         currentBudgetId = null;
         fetchBudgets();
       } catch (error) {
         console.error(error);
-        alert('Error submitting budget');
+        errorMsg.textContent = 'Error submitting budget';
       }
     }
 
@@ -96,12 +105,10 @@
         <input id="allocated" type="number" class="border rounded px-2 py-1 w-full" required />
         <label class="block text-gray-700 mt-2">Spent Amount:</label>
         <input id="spent" type="number" class="border rounded px-2 py-1 w-full" required />
-        <button
-          class="bg-yellow-600 text-white px-4 py-2 rounded mt-3 hover:bg-yellow-700"
-          type="submit"
-        >
+        <button class="bg-yellow-600 text-white px-4 py-2 rounded mt-3 hover:bg-yellow-700" type="submit">
           Add / Update Budget
         </button>
+        <p id="errorMsg" class="text-red-600 mt-2"></p>
       </form>
     </div>
 
