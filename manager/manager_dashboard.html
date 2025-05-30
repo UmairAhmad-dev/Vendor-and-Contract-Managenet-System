@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +9,22 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
-  <style>
-    table {
-      border-collapse: collapse; /* merge borders */
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid black; /* border for every cell */
-      padding: 8px;
-      text-align: left;
-    }
-  </style>
+<style>
+  table {
+    border-collapse: collapse;
+    /* merge borders */
+    width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid black;
+    /* border for every cell */
+    padding: 8px;
+    text-align: left;
+  }
+</style>
+
 <body class="bg-gray-50 font-sans">
   <!-- Navbar -->
   <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-6 shadow-md">
@@ -30,7 +36,8 @@
         <a href="contract-management.html" class="px-4 hover:underline">Contracts</a>
         <a href="budget-management.html" class="px-4 hover:underline">Budget</a>
         <a href="generate-reports.html" class="px-4 hover:underline">Reports</a>
-        <a href="view-orders.html" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500">View Purchase Orders</a>
+        <a href="view-orders.html" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500">View Purchase
+          Orders</a>
         <a href="team-management.html" class="px-4 hover:underline">Team Management</a>
       </nav>
     </div>
@@ -44,10 +51,20 @@
         <h2 class="text-2xl font-semibold text-blue-800">Vendor Management</h2>
         <p class="text-gray-600 mt-2">Manage vendors to ensure compliance and performance.</p>
       </div>
-      <button 
-        class="bg-blue-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-700" 
+      <button class="bg-blue-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-700"
         onclick="window.location.href='vendor-list.html'">
         Manage Vendors
+      </button>
+    </section>
+    <!-- Department Management Section -->
+    <section class="bg-purple-50 rounded-lg p-6 shadow-md flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold text-purple-800">Department Management</h2>
+        <p class="text-gray-600 mt-2">Create, update, or remove departments and monitor budgets.</p>
+      </div>
+      <button class="bg-purple-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-purple-700"
+        onclick="window.location.href='department-management.html'">
+        Manage Departments
       </button>
     </section>
 
@@ -57,8 +74,7 @@
         <h2 class="text-2xl font-semibold text-green-800">Contract Management</h2>
         <p class="text-gray-600 mt-2">Oversee contracts to ensure smooth operations and renewals.</p>
       </div>
-      <button 
-        class="bg-green-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-green-700" 
+      <button class="bg-green-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-green-700"
         onclick="window.location.href='contract-management.html'">
         Manage Contracts
       </button>
@@ -72,13 +88,11 @@
           <p class="text-gray-600 mt-2">Manage budgets and monitor purchase orders efficiently.</p>
         </div>
         <div class="space-x-4">
-          <button 
-            class="bg-yellow-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-yellow-500" 
+          <button class="bg-yellow-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-yellow-500"
             onclick="window.location.href='budget-management.html'">
             Manage Budget
           </button>
-          <button 
-            class="bg-gray-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-gray-500" 
+          <button class="bg-gray-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-gray-500"
             onclick="window.location.href='purchase-orders.html'">
             View Orders
           </button>
@@ -92,8 +106,7 @@
         <h2 class="text-2xl font-semibold text-indigo-800">Reports</h2>
         <p class="text-gray-600 mt-2">Generate detailed reports for performance and compliance tracking.</p>
       </div>
-      <button 
-        class="bg-indigo-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700" 
+      <button class="bg-indigo-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700"
         onclick="window.location.href='generate-report.html'">
         Generate Reports
       </button>
@@ -105,8 +118,7 @@
         <h2 class="text-2xl font-semibold text-purple-800">Team Management</h2>
         <p class="text-gray-600 mt-2">Manage your team, assign roles, and track team performance.</p>
       </div>
-      <button 
-        class="bg-purple-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-purple-700" 
+      <button class="bg-purple-800 text-white py-2 px-6 rounded-lg shadow-md hover:bg-purple-700"
         onclick="window.location.href='team-management.html'">
         Manage Team
       </button>
@@ -147,12 +159,12 @@
   </footer>
 
   <script>
-  $(document).ready(function() {
+    $(document).ready(function () {
 
-    // Fetch Budgets
-    $('#viewBudgets').click(function() {
-      $.get('http://localhost:3000/budgets', function(data) {
-        let budgetsHtml = `
+      // Fetch Budgets
+      $('#viewBudgets').click(function () {
+        $.get('http://localhost:3000/budgets', function (data) {
+          let budgetsHtml = `
           <table border="1">
             <tr>
               <th>Budget ID</th>
@@ -161,8 +173,8 @@
               <th>Remaining</th>
             </tr>
         `;
-        data.forEach(budget => {
-          budgetsHtml += `
+          data.forEach(budget => {
+            budgetsHtml += `
             <tr>
               <td>${budget.BudgetID}</td>
               <td>${budget.AllocatedAmount}</td>
@@ -170,39 +182,39 @@
               <td>${budget.RemainingAmount}</td>
             </tr>
           `;
+          });
+          budgetsHtml += '</table>';
+          $('#budgetsSection').html(budgetsHtml);
         });
-        budgetsHtml += '</table>';
-        $('#budgetsSection').html(budgetsHtml);
       });
-    });
 
-    // Fetch Departments
-    $('#viewDepartments').click(function() {
-      $.get('http://localhost:3000/departments', function(data) {
-        let departmentsHtml = `
+      // Fetch Departments
+      $('#viewDepartments').click(function () {
+        $.get('http://localhost:3000/departments', function (data) {
+          let departmentsHtml = `
           <table border="1">
             <tr>
               <th>Department Name</th>
               <th>Budget ID</th>
             </tr>
         `;
-        data.forEach(department => {
-          departmentsHtml += `
+          data.forEach(department => {
+            departmentsHtml += `
             <tr>
               <td>${department.Name}</td>
               <td>${department.BudgetID}</td>
             </tr>
           `;
+          });
+          departmentsHtml += '</table>';
+          $('#departmentsSection').html(departmentsHtml);
         });
-        departmentsHtml += '</table>';
-        $('#departmentsSection').html(departmentsHtml);
       });
-    });
 
-    // Fetch Vendors
-    $('#viewVendors').click(function() {
-      $.get('http://localhost:3000/vendors', function(data) {
-        let vendorsHtml = `
+      // Fetch Vendors
+      $('#viewVendors').click(function () {
+        $.get('http://localhost:3000/vendors', function (data) {
+          let vendorsHtml = `
           <table border="1">
             <tr>
               <th>Vendor Name</th>
@@ -210,22 +222,23 @@
               <th>Performance Rating</th>
             </tr>
         `;
-        data.forEach(vendor => {
-          vendorsHtml += `
+          data.forEach(vendor => {
+            vendorsHtml += `
             <tr>
               <td>${vendor.Name}</td>
               <td>${vendor.ServiceCategory}</td>
               <td>${vendor.PerformanceRating}</td>
             </tr>
           `;
+          });
+          vendorsHtml += '</table>';
+          $('#vendorsSection').html(vendorsHtml);
         });
-        vendorsHtml += '</table>';
-        $('#vendorsSection').html(vendorsHtml);
       });
-    });
 
-  });
-</script>
+    });
+  </script>
 
 </body>
+
 </html>

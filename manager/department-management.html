@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Department Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+
+  <div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
+    <h1 class="text-2xl font-bold mb-4 text-purple-800">Department Management</h1>
+
+    <!-- Form to Add / Update Department -->
+    <form id="departmentForm" class="space-y-4 mb-8">
+      <input type="hidden" id="departmentId" />
+      <div>
+        <label class="block font-semibold">Department Name</label>
+        <input type="text" id="name" class="w-full border rounded px-3 py-2" required />
+      </div>
+      <div>
+        <label class="block font-semibold">Budget ID</label>
+        <input type="number" id="budgetId" class="w-full border rounded px-3 py-2" required />
+      </div>
+      <button type="submit" class="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600">
+        Add Department
+      </button>
+      <button type="button" id="cancelUpdate" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 hidden">
+        Cancel Update
+      </button>
+    </form>
+
+    <!-- Department List -->
+    <h2 class="text-xl font-semibold mb-2 text-purple-700">Existing Departments</h2>
+    <table class="w-full border table-auto">
+      <thead>
+        <tr class="bg-purple-100">
+          <th class="border px-4 py-2">ID</th>
+          <th class="border px-4 py-2">Name</th>
+          <th class="border px-4 py-2">Budget ID</th>
+          <th class="border px-4 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="departmentTable" class="text-center">
+        <!-- Dynamic rows go here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Load departments on page load
+    window.onload = fetchDepartments;
+
+    // Fetch and display departments
+    function fetchDepartments() {
+      fetch('http://localhost:3000/departments')
+        .then(res => res.json())
+        .then(data => {
+          const table = document.getElementById('departmentTable');
+          table.innerHTML = '';
+          data.forEach(dept => {
+            table.innerHTML += `
+              <tr>
+                <td class="border px-4 py-2">${dept.DepartmentID || ''}</td>
+                <td class="border px-4 py-2">${dept.Name}</td>
+                <td class="border px-4 py-2">${dept.BudgetID}</td>
+                <td class="border px-4 py-2 space-x-2">
+      <button onclick="startUpdate(${dept.DepartmentID}, '${dept.Name}', ${dept.BudgetID})"
+        class="bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700">
+        Update
+      </button>
+      <button onclick="deleteDepartment(${dept.DepartmentID})"
+        class="bg-white text-purple-600 border border-purple-600 px-2 py-1 rounded hover:bg-purple-100">
+        Delete
+      </button>
+                </td>
+              </tr>
+            `;
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching departments:', err);
+          alert('Failed to load departments');
+        });
+    }
+
+    // Start updating a department: populate form with values
+    function startUpdate(id, name, budgetId) {
+      document.getElementById('departmentId').value = id;
+      document.getElementById('name').value = name;
+      document.getElementById('budgetId').value = budgetId;
+      document.querySelector('#departmentForm button[type="submit"]').textContent = 'Update Department';
+      document.getElementById('cancelUpdate').classList.remove('hidden');
+    }
+
+    // Cancel update mode, reset form
+    document.getElementById('cancelUpdate').addEventListener('click', () => {
+      resetForm();
+    });
+
+    // Reset form and buttons to add mode
+    function resetForm() {
+      document.getElementById('departmentId').value = '';
+      document.getElementById('name').value = '';
+      document.getElementById('budgetId').value = '';
+      document.querySelector('#departmentForm button[type="submit"]').textContent = 'Add Department';
+      document.getElementById('cancelUpdate').classList.add('hidden');
+    }
+
+    // Handle form submission (Add or Update)
+    document.getElementById('departmentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('departmentId').value;
+      const name = document.getElementById('name').value;
+      const budgetId = document.getElementById('budgetId').value;
+
+      if (id) {
+        // Update department
+        fetch(`http://localhost:3000/departments/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ Name: name, BudgetID: Number(budgetId) }) // Convert to number here
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          fetchDepartments();
+          resetForm();
+        })
+        .catch(err => {
+          console.error('Error updating department:', err);
+          alert('Failed to update department');
+        });
+      } else {
+        // Add new department
+        fetch('http://localhost:3000/departments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ Name: name, BudgetID: Number(budgetId) }) // Convert to number here too
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          fetchDepartments();
+          resetForm();
+        })
+        .catch(err => {
+          console.error('Error adding department:', err);
+          alert('Failed to add department');
+        });
+      }
+    });
+
+    // Delete a department
+    function deleteDepartment(id) {
+      if (!confirm('Are you sure you want to delete this department?')) return;
+
+      fetch(`http://localhost:3000/departments/${id}`, {
+        method: 'DELETE'
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        fetchDepartments();
+      })
+      .catch(err => {
+        console.error('Error deleting department:', err);
+        alert('Failed to delete department');
+      });
+    }
+  </script>
+
+</body>
+</html>

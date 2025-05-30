@@ -34,10 +34,11 @@ db.connect(err => {
 
 // Routes
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
-});
-// Register route
+////////////////////CRUD FOR USERS//////////
+
+
+
+//CREATE//
 app.post('/register', (req, res) => {
   const { username, password, role } = req.body;
 
@@ -60,6 +61,7 @@ app.post('/register', (req, res) => {
   });
 });
 //login
+/////READ////
 app.get('/users', (req, res) => {
   db.query('SELECT LoginID, Username, Role FROM LoginCredentials', (err, results) => {
     if (err) return res.status(500).send('Error fetching users');
@@ -106,6 +108,9 @@ app.get('/Users', (req, res) => {
 });
 
 // CRUD for Budgets
+
+
+//READ//
 app.get('/budgets', (req, res) => {
   db.query('SELECT * FROM Budgets', (err, results) => {
     if (err) {
@@ -114,7 +119,7 @@ app.get('/budgets', (req, res) => {
     res.json(results);
   });
 });
-
+//CREATE//
 app.post('/budgets', (req, res) => {
   const { AllocatedAmount, SpentAmount } = req.body;
   db.query(
@@ -129,7 +134,7 @@ app.post('/budgets', (req, res) => {
   );
 });
 
-// Update Budget
+// Update //
 app.put('/budgets/:id', (req, res) => {
   const { id } = req.params;
   const { AllocatedAmount, SpentAmount } = req.body;
@@ -145,7 +150,7 @@ app.put('/budgets/:id', (req, res) => {
   );
 });
 
-// Delete Budget
+// Delete //
 app.delete('/budgets/:id', (req, res) => {
   const { id } = req.params;
   db.query('DELETE FROM Budgets WHERE BudgetID = ?', [id], (err, results) => {
@@ -188,6 +193,8 @@ app.post('/vendors', (req, res) => {
 });
 
 // CRUD for Departments
+
+//READ//
 app.get('/departments', (req, res) => {
   db.query('SELECT * FROM Departments', (err, results) => {
     if (err) {
@@ -196,7 +203,7 @@ app.get('/departments', (req, res) => {
     res.json(results);
   });
 });
-
+//CREATE
 app.post('/departments', (req, res) => {
   const { Name, BudgetID } = req.body;
   db.query(
@@ -207,6 +214,43 @@ app.post('/departments', (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       res.json({ message: 'Department added successfully', DepartmentID: results.insertId });
+    }
+  );
+});
+//UPDATE
+app.put('/departments/:id', (req, res) => {
+  const { id } = req.params;
+  const { Name, BudgetID } = req.body;
+
+  db.query(
+    'UPDATE Departments SET Name = ?, BudgetID = ? WHERE DepartmentID = ?',
+    [Name, BudgetID, id],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'Department not found' });
+      }
+      res.json({ message: 'Department updated successfully' });
+    }
+  );
+});
+//DELETE//
+app.delete('/departments/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.query(
+    'DELETE FROM Departments WHERE DepartmentID = ?',
+    [id],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'Department not found' });
+      }
+      res.json({ message: 'Department deleted successfully' });
     }
   );
 });
@@ -362,4 +406,8 @@ app.delete('/contracts/:id', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
 });
