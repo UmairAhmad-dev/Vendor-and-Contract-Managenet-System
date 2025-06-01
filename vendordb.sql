@@ -80,10 +80,11 @@ CREATE TABLE LoginCredentials (
 -- 8. Triggers
 CREATE TABLE IF NOT EXISTS Notifications (
     NotificationID INT AUTO_INCREMENT PRIMARY KEY,
+       ContractID INT,
     Message TEXT,
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- Set delimiter to $$ to allow semicolons inside the trigger body
+-- Set delimiter to $$ to all;ow semicolons inside the trigger body
 DELIMITER $$
 
 CREATE TRIGGER ContractRenewalTrigger
@@ -91,13 +92,12 @@ AFTER INSERT ON Contracts
 FOR EACH ROW
 BEGIN
     IF DATEDIFF(NEW.EndDate, CURDATE()) <= 30 THEN
-        INSERT INTO Notifications (Message) VALUES ('Contract nearing expiration!');
+        INSERT INTO Notifications (ContractID,Message) VALUES (NEW.ContractID,CONCAT('Contract ', NEW.ContractID, ' nearing expiration!'));
     END IF;
 END $$
 
--- Reset delimiter to the default semicolon
+Reset delimiter to the default semicolon
 DELIMITER ;
-
 
 -- Set the delimiter to $$ to allow semicolons inside the trigger
 DELIMITER $$

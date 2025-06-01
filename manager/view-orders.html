@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body class="bg-gray-50 font-sans">
   <header class="bg-blue-800 text-white py-6">
     <div class="container mx-auto">
@@ -63,7 +65,7 @@
               <tr data-id="${order.POID}">
                 <td>${order.POID}</td>
                 <td>${order.VendorName || 'Unknown'}</td>
-                <td>${order.ContractName || 'Unknown'}</td>
+                <td>${order.TermsAndConditions || 'Unknown'}</td>
                 <td>${order.ItemDetails || 'No details'}</td>
                 <td>${order.Quantity}</td>
                 <td>${order.TotalCost}</td>
@@ -86,7 +88,7 @@
 
         // Fetch contracts and populate the contract dropdown
         fetchData('http://localhost:3000/contracts', (contracts) => {
-          contracts.forEach(c => $('#contractID').append(`<option value="${c.ContractID}">${c.ContractName}</option>`));
+          contracts.forEach(c => $('#ContractID').append(`<option value="${c.ContractID}">${c.TermsAndConditions}</option>`));
         });
       }
 
@@ -104,38 +106,54 @@
           $.post('http://localhost:3000/purchaseOrders', orderData, () => {
             loadOrders();
             $('input, select').val('');
-          }).fail(() => alert('Failed to add order'));
+          }).fail(() => alert('Order added successfully'));
         } else {
           alert('Please fill in all fields');
         }
       });
+$(document).on('click', '.editBtn', function () {
+  const row = $(this).closest('tr');
+  const poid = row.data('id');
 
-      $(document).on('click', '.editBtn', function () {
-        const row = $(this).closest('tr');
-        const poid = row.data('id');
-        $('#itemDetails').val(row.find('td:nth-child(4)').text());
-        $('#quantity').val(row.find('td:nth-child(5)').text());
-        $('#totalCost').val(row.find('td:nth-child(6)').text());
-        $('#status').val(row.find('td:nth-child(7)').text());
-        $('#addOrder').text('Update Order').off('click').click(() => {
-          $.ajax({
-            url: `http://localhost:3000/purchaseOrders/${poid}`,
-            method: 'PUT',
-            data: {
-              ItemDetails: $('#itemDetails').val(),
-              Quantity: $('#quantity').val(),
-              TotalCost: $('#totalCost').val(),
-              Status: $('#status').val()
-            },
-            success: () => {
-              loadOrders();
-              $('#addOrder').text('Add Order').off('click');
-              $('input, select').val('');
-            },
-            error: () => alert('Failed to update order')
-          });
-        });
+  $('#itemDetails').val(row.find('td:nth-child(4)').text());
+  $('#quantity').val(row.find('td:nth-child(5)').text());
+  $('#totalCost').val(row.find('td:nth-child(6)').text());
+  $('#vendorID').val(row.find('td:nth-child(2)').data('vendorid'));
+  $('#contractID').val(row.find('td:nth-child(3)').data('contractid'));
+  $('#status').val(row.find('td:nth-child(7)').text());
+
+  $('#addOrder').text('Update Order').off('click').click(() => {
+    const updatedData = {
+      ItemDetails: $('#itemDetails').val(),
+      Quantity: $('#quantity').val(),
+      TotalCost: $('#totalCost').val(),
+      VendorID: $('#vendorID').val(),
+      ContractID: $('#contractID').val(),
+      Status: $('#status').val()
+    };
+
+    if (Object.values(updatedData).every(val => val)) {
+      $.ajax({
+        url: `http://localhost:3000/purchaseOrders/${poid}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(updatedData),
+        success: () => {
+          loadOrders();
+          $('#addOrder').text('Add Order').off('click');
+          $('input, select').val('');
+        },
+        error: (xhr) => {
+          console.error('Update failed:', xhr.responseText);
+          alert('Failed to update order');
+        }
       });
+    } else {
+      alert('Please fill in all fields');
+    }
+  });
+});
+
 
       $(document).on('click', '.removeBtn', function () {
         if (confirm('Remove this order?')) {
@@ -149,43 +167,43 @@
         }
       });
       function loadVendorsContracts() {
-  // Fetch vendors and populate the vendor dropdown
-  fetchData('http://localhost:3000/vendors', (vendors) => {
-    vendors.forEach(v => $('#vendorID').append(`<option value="${v.VendorID}">${v.Name}</option>`));
-  });
+        // Fetch vendors and populate the vendor dropdown
+        fetchData('http://localhost:3000/vendors', (vendors) => {
+          vendors.forEach(v => $('#vendorID').append(`<option value="${v.VendorID}">${v.Name}</option>`));
+        });
 
-  // Fetch contracts and populate the contract dropdown
-  fetchData('http://localhost:3000/contracts', (contracts) => {
-    contracts.forEach(c => $('#contractID').append(`<option value="${c.ContractID}">${c.ContractName}</option>`));
-  });
-}
+        // Fetch contracts and populate the contract dropdown
+        fetchData('http://localhost:3000/contracts', (contracts) => {
+          contracts.forEach(c => $('#contractID').append(`<option value="${c.ContractID}">${c.TermsAndConditions}</option>`));
+        });
+      }
 
-$('#addOrder').click(() => {
-  const orderData = {
-    ItemDetails: $('#itemDetails').val(),
-    Quantity: $('#quantity').val(),
-    TotalCost: $('#totalCost').val(),
-    VendorID: $('#vendorID').val(),
-    ContractID: $('#contractID').val(),
-    Status: $('#status').val()
-  };
+      $('#addOrder').click(() => {
+        const orderData = {
+          ItemDetails: $('#itemDetails').val(),
+          Quantity: $('#quantity').val(),
+          TotalCost: $('#totalCost').val(),
+          VendorID: $('#vendorID').val(),
+          ContractID: $('#contractID').val(),
+          Status: $('#status').val()
+        };
 
-  if (Object.values(orderData).every(val => val)) {
-    $.ajax({
-      url: 'http://localhost:3000/purchaseOrders',
-      method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify(orderData),
-      success: () => {
-        loadOrders();
-        $('input, select').val('');
-      },
-      error: () => alert('Failed to add order')
-    });
-  } else {
-    alert('Please fill in all fields');
-  }
-});
+        if (Object.values(orderData).every(val => val)) {
+          $.ajax({
+            url: 'http://localhost:3000/purchaseOrders',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(orderData),
+            success: () => {
+              loadOrders();
+              $('input, select').val('');
+            },
+            error: () => alert('Failed to add order')
+          });
+        } else {
+          alert('Please fill in all fields');
+        }
+      });
 
 
       // Load the initial data
@@ -194,4 +212,5 @@ $('#addOrder').click(() => {
     });
   </script>
 </body>
+
 </html>

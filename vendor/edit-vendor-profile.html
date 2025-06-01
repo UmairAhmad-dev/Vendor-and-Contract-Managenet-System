@@ -1,57 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Vendor Profile</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Contracts</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body class="bg-gray-50 font-sans">
   <header class="bg-blue-800 text-white py-6">
     <div class="container mx-auto">
-      <h1 class="text-3xl font-bold">Edit Vendor Profile</h1>
+      <h1 class="text-3xl font-bold">Contracts</h1>
     </div>
   </header>
 
   <main class="container mx-auto mt-10">
-    <form class="bg-white p-6 rounded-lg shadow-md space-y-4">
-      <h2 class="text-2xl font-semibold text-gray-800">Update Your Profile</h2>
+    <h2 class="text-xl font-semibold mb-4">Manage Contracts</h2>
+    <div class="mb-6 space-x-2 space-y-2 flex flex-wrap items-center">
+      <!-- Replace with your contract fields and their original IDs/names -->
+      <input id="contractID" class="px-4 py-2 border rounded" type="text" placeholder="Contract ID" />
+      <input id="termsAndConditions" class="px-4 py-2 border rounded w-full md:w-auto" type="text" placeholder="Terms And Conditions" />
+      <input id="startDate" class="px-4 py-2 border rounded" type="date" />
+      <input id="endDate" class="px-4 py-2 border rounded" type="date" />
+      <select id="vendorID" class="px-4 py-2 border rounded">
+        <option value="">Select Vendor</option>
+      </select>
+      <button id="addContract" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Add Contract</button>
+    </div>
 
-      <!-- Vendor Name -->
-      <div>
-        <label for="vendor-name" class="block text-gray-700">Vendor Name</label>
-        <input type="text" id="vendor-name" class="w-full border border-gray-300 p-2 rounded-lg" placeholder="Enter Vendor Name">
-      </div>
-
-      <!-- Email -->
-      <div>
-        <label for="email" class="block text-gray-700">Email</label>
-        <input type="email" id="email" class="w-full border border-gray-300 p-2 rounded-lg" placeholder="Enter Email">
-      </div>
-
-      <!-- Phone -->
-      <div>
-        <label for="phone" class="block text-gray-700">Phone</label>
-        <input type="text" id="phone" class="w-full border border-gray-300 p-2 rounded-lg" placeholder="Enter Phone Number">
-      </div>
-
-      <!-- Address -->
-      <div>
-        <label for="address" class="block text-gray-700">Address</label>
-        <textarea id="address" class="w-full border border-gray-300 p-2 rounded-lg" placeholder="Enter Address"></textarea>
-      </div>
-
-      <div class="flex justify-between">
-        <button type="submit" class="bg-blue-800 text-white py-2 px-6 rounded-lg hover:bg-blue-700">Save Changes</button>
-        <button type="button" class="bg-gray-600 text-white py-2 px-6 rounded-lg hover:bg-gray-500">Cancel</button>
-      </div>
-    </form>
+    <table id="contractsTable" class="w-full border border-gray-300">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="border px-2 py-1">Contract ID</th>
+          <th class="border px-2 py-1">Terms & Conditions</th>
+          <th class="border px-2 py-1">Start Date</th>
+          <th class="border px-2 py-1">End Date</th>
+          <th class="border px-2 py-1">Vendor</th>
+          <th class="border px-2 py-1">Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </main>
 
-  <footer class="bg-gray-800 text-white py-6 mt-10">
-    <div class="container mx-auto text-center">
-      <p>© 2024 Vendor Management Dashboard. All rights reserved.</p>
-    </div>
-  </footer>
+  <script>
+    $(function () {
+      // Helper to fetch data
+      const fetchData = (url, cb) => $.get(url, cb).fail(() => alert('Failed to fetch data'));
+
+      // Load contracts and populate table
+      function loadContracts() {
+        fetchData('http://localhost:3000/contracts', (data) => {
+          const tbody = $('#contractsTable tbody').empty();
+          data.forEach(contract => {
+            tbody.append(`
+              <tr data-id="${contract.ContractID}">
+                <td class="border px-2 py-1">${contract.ContractID}</td>
+                <td class="border px-2 py-1">${contract.TermsAndConditions}</td>
+                <td class="border px-2 py-1">${contract.StartDate}</td>
+                <td class="border px-2 py-1">${contract.EndDate}</td>
+                <td class="border px-2 py-1">${contract.VendorName || 'Unknown'}</td>
+                <td class="border px-2 py-1">
+                  <button class="bg-green-600 text-white px-2 py-1 rounded editBtn">Edit</button>
+                  <button class="bg-red-600 text-white px-2 py-1 rounded removeBtn">Remove</button>
+                </td>
+              </tr>
+            `);
+          });
+        });
+      }
+
+      // Load vendors for dropdown
+      function loadVendors() {
+        fetchData('http://localhost:3000/vendors', (vendors) => {
+          vendors.forEach(v => $('#vendorID').append(`<option value="${v.VendorID}">${v.Name}</option>`));
+        });
+      }
+
+      // Add or update contract
+      function submitContract(isUpdate = false, contractID = null) {
+        const contractData = {
+          ContractID: $('#contractID').val(),
+          TermsAndConditions: $('#termsAndConditions').val(),
+          StartDate: $('#startDate').val(),
+          EndDate: $('#endDate').val(),
+          VendorID: $('#vendorID').val(),
+        };
+
+        if (Object.values(contractData).some(val => !val)) {
+          alert('Please fill in all fields');
+          return;
+        }
+
+        if (isUpdate) {
+          $.ajax({
+            url: `http://localhost:3000/contracts/${contractID}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(contractData),
+            success: () => {
+              loadContracts();
+              resetForm();
+            },
+            error: () => alert('Failed to update contract'),
+          });
+        } else {
+          $.ajax({
+            url: 'http://localhost:3000/contracts',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(contractData),
+            success: () => {
+              loadContracts();
+              resetForm();
+            },
+            error: () => alert('Failed to add contract'),
+          });
+        }
+      }
+
+      // Reset form and button
+      function resetForm() {
+        $('input, select').val('');
+        $('#addContract').text('Add Contract').off('click').click(() => submitContract());
+      }
+
+      // Initial add click
+      $('#addContract').click(() => submitContract());
+
+      // Edit contract event
+      $(document).on('click', '.editBtn', function () {
+        const row = $(this).closest('tr');
+        const id = row.data('id');
+
+        $('#contractID').val(row.find('td:nth-child(1)').text());
+        $('#termsAndConditions').val(row.find('td:nth-child(2)').text());
+        $('#startDate').val(row.find('td:nth-child(3)').text());
+        $('#endDate').val(row.find('td:nth-child(4)').text());
+        // Set vendor dropdown by matching vendor name
+        const vendorName = row.find('td:nth-child(5)').text();
+        $('#vendorID option').each(function () {
+          if ($(this).text() === vendorName) {
+            $('#vendorID').val($(this).val());
+          }
+        });
+
+        $('#addContract').text('Update Contract').off('click').click(() => submitContract(true, id));
+      });
+
+      // Remove contract event
+      $(document).on('click', '.removeBtn', function () {
+        if (confirm('Remove this contract?')) {
+          const contractID = $(this).closest('tr').data('id');
+          $.ajax({
+            url: `http://localhost:3000/contracts/${contractID}`,
+            method: 'DELETE',
+            success: () => {
+              loadContracts();
+            },
+            error: () => alert('Failed to remove contract'),
+          });
+        }
+      });
+
+      // Load data on page load
+      loadContracts();
+      loadVendors();
+    });
+  </script>
 </body>
+
 </html>

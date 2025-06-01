@@ -349,13 +349,13 @@ app.get('/reports/budgetOverview', (req, res) => {
   });
 });
 
-// CRUD for Purchase Orders
+//CRUD for Purchase Orders
 app.get('/purchaseOrders', (req, res) => {
   db.query(
     `SELECT 
        PO.POID, 
        V.Name AS VendorName, 
-       C.ContractName, 
+       C.TermsAndConditions, 
        PO.ItemDetails, 
        PO.Quantity, 
        PO.TotalCost, 
@@ -371,6 +371,8 @@ app.get('/purchaseOrders', (req, res) => {
     }
   );
 });
+
+
 
 app.post('/purchaseOrders', (req, res) => {
   const { VendorID, ContractID, ItemDetails, Quantity, TotalCost, Status } = req.body;
@@ -391,6 +393,11 @@ app.post('/purchaseOrders', (req, res) => {
 app.put('/purchaseOrders/:id', (req, res) => {
   const { id } = req.params;
   const { VendorID, ContractID, ItemDetails, Quantity, TotalCost, Status } = req.body;
+
+  if (!VendorID || !ContractID || !ItemDetails || !Quantity || !TotalCost || !Status) {
+    return res.status(400).json({ error: 'Missing fields in request body' });
+  }
+
   db.query(
     `UPDATE PurchaseOrders 
      SET VendorID = ?, ContractID = ?, ItemDetails = ?, Quantity = ?, TotalCost = ?, Status = ? 
@@ -400,10 +407,14 @@ app.put('/purchaseOrders/:id', (req, res) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: 'No record found with this ID' });
+      }
       res.json({ message: 'Purchase Order updated successfully' });
     }
   );
 });
+
 
 app.delete('/purchaseOrders/:id', (req, res) => {
   const { id } = req.params;
@@ -416,19 +427,50 @@ app.delete('/purchaseOrders/:id', (req, res) => {
 });
 
 // Get all contracts
-app.get('/contracts', (req, res) => {
-  db.query('SELECT * FROM Contracts', (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results); // Send contracts data to the frontend
-  });
-});
 
-// Add a new contract
+
+// Get all contracts with vendor names
+  app.get('/contracts', (req, res) => {
+    const sql = `
+SELECT 
+        Contracts.ContractID,
+        Vendors.Name as VendorName,
+        Departments.Name as DepartmentName,
+        Contracts.TermsAndConditions,
+        Contracts.StartDate,
+        Contracts.EndDate,
+        Contracts.Status
+      FROM Contracts
+      JOIN Vendors ON Contracts.VendorID = Vendors.VendorID
+      JOIN Departments ON Contracts.DepartmentID = Departments.DepartmentID
+    `;
+
+    db.query(sql, (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(results);
+    });
+  });
+
+
+
 app.post('/contracts', (req, res) => {
-  const { ContractName, Status } = req.body;
+  const { VendorID, DepartmentID, TermsAndConditions, StartDate, EndDate, Status } = req.body;
+
+  if (!VendorID || !DepartmentID || !StartDate || !EndDate) {
+    return res.status(400).json({ error: 'VendorID, DepartmentID, StartDate and EndDate are required.' });
+  }
+
+  const contractStatus = Status || 'Active'; // default value
+
+  const sql = `
+    INSERT INTO Contracts 
+    (VendorID, DepartmentID, TermsAndConditions, StartDate, EndDate, Status)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
   db.query(
-    'INSERT INTO Contracts (ContractName, Status) VALUES (?, ?)',
-    [ContractName, Status],
+    sql,
+    [VendorID, DepartmentID, TermsAndConditions || '', StartDate, EndDate, contractStatus],
     (err, results) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Contract added successfully', ContractID: results.insertId });
@@ -436,19 +478,49 @@ app.post('/contracts', (req, res) => {
   );
 });
 
-// Update an existing contract
+
+app.get('/contracts/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.query('SELECT * FROM Contracts WHERE ContractID = ?', [id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Contract not found' });
+    }
+
+    res.json(results[0]);
+  });
+});
+
+
 app.put('/contracts/:id', (req, res) => {
   const { id } = req.params;
-  const { ContractName, Status } = req.body;
+  const { VendorID, TermsAndConditions, StartDate, EndDate, Status } = req.body;
+
+  // Validate required fields
+  if (!VendorID || !TermsAndConditions || !StartDate || !EndDate || !Status) {
+    return res.status(400).json({ error: 'Missing fields in request body' });
+  }
+
+  // Update the contract
   db.query(
-    'UPDATE Contracts SET ContractName = ?, Status = ? WHERE ContractID = ?',
-    [ContractName, Status, id],
+    `UPDATE Contracts 
+     SET VendorID = ?, TermsAndConditions = ?, StartDate = ?, EndDate = ?, Status = ?
+     WHERE ContractID = ?`,
+    [VendorID, TermsAndConditions, StartDate, EndDate, Status, id],
     (err, results) => {
       if (err) return res.status(500).json({ error: err.message });
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: 'No contract found with this ID' });
+      }
+
       res.json({ message: 'Contract updated successfully' });
     }
   );
 });
+
 
 // Delete a contract
 app.delete('/contracts/:id', (req, res) => {
@@ -459,6 +531,89 @@ app.delete('/contracts/:id', (req, res) => {
   });
 });
 
+//Notifications
+app.get('/notifications', (req, res) => {
+  db.query('SELECT * FROM Notifications ORDER BY CreatedAt DESC', (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+    res.json(results);
+  });
+});
+
+function parseDateOnly(dateString) {
+  // Expecting dateString in YYYY-MM-DD format, e.g. '2024-04-05'
+  const parts = dateString.split('-');
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1; // JS months 0-based
+  const day = parseInt(parts[2], 10);
+  return new Date(year, month, day);
+}
+
+app.post('/contracts/renew', (req, res) => {
+  const { contractID, endDate } = req.body;
+
+  if (!contractID || !endDate) {
+    return res.status(400).json({ error: 'contractID and endDate are required' });
+  }
+
+  const today = new Date();
+  const todayNoTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const newEndDate = parseDateOnly(endDate);
+
+  console.log('Today:', todayNoTime);
+  console.log('New End Date:', newEndDate);
+
+  const diffMs = newEndDate - todayNoTime;
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  console.log('Difference in days:', diffDays);
+
+  let newStatus = '';
+
+  if (diffDays < 0) {
+    newStatus = 'Expired';
+  } else if (diffDays <= 30) {
+    newStatus = 'Renewal';
+  } else {
+    newStatus = 'Active';
+  }
+
+  console.log('New status to set:', newStatus);
+
+  const sql = `
+    UPDATE Contracts
+    SET EndDate = ?, Status = ?
+    WHERE ContractID = ?
+  `;
+
+  db.query(sql, [endDate, newStatus, contractID], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: err.message });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'Contract not found' });
+    }
+
+    res.json({ message: 'Contract renewed and status updated successfully', status: newStatus });
+  });
+});
+
+
+app.post('/vendors/evaluate', (req, res) => {
+  const { vendorID, performance } = req.body;
+
+  if (!vendorID || performance === undefined) {
+    return res.status(400).json({ error: 'Missing vendorID or performance value' });
+  }
+
+  db.query('CALL EvaluateVendorPerformance(?, ?)', [vendorID, performance], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    res.json({ message: 'Vendor performance updated successfully', results });
+  });
+});
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
