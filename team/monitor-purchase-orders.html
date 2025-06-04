@@ -1,21 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitor Purchase Orders</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Purchase Orders Monitoring</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body class="bg-gray-50 font-sans">
-  <header class="bg-yellow-600 text-white py-4">
+  <header class="bg-blue-800 text-white py-6">
     <div class="container mx-auto">
-      <h1 class="text-2xl font-bold">Purchase Orders</h1>
+      <h1 class="text-3xl font-bold">Purchase Orders Monitoring</h1>
     </div>
   </header>
+
   <main class="container mx-auto mt-10">
-    <h2 class="text-xl font-semibold mb-4">Monitor Purchase Orders</h2>
-    <p>Monitor the progress and status of your purchase orders.</p>
-    <!-- Add content for monitoring orders -->
+    <h2 class="text-xl font-semibold mb-4">All Purchase Orders</h2>
+
+    <table id="purchaseOrdersTable" class="w-full border border-gray-300">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-2 border">POID</th>
+          <th class="px-4 py-2 border">Vendor</th>
+          <th class="px-4 py-2 border">Contract</th>
+          <th class="px-4 py-2 border">Item</th>
+          <th class="px-4 py-2 border">Qty</th>
+          <th class="px-4 py-2 border">Cost</th>
+          <th class="px-4 py-2 border">Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </main>
+
+  <script>
+    $(function () {
+      function fetchData(url, cb) {
+        $.get(url, cb).fail(() => alert('Failed to fetch data'));
+      }
+
+      function loadOrders() {
+        fetchData('http://localhost:3000/purchaseOrders', (data) => {
+          const tbody = $('#purchaseOrdersTable tbody').empty();
+          data.forEach(order => {
+            tbody.append(`
+              <tr class="text-center">
+                <td class="px-4 py-2 border">${order.POID}</td>
+                <td class="px-4 py-2 border">${order.VendorName || 'Unknown'}</td>
+                <td class="px-4 py-2 border">${order.TermsAndConditions || 'Unknown'}</td>
+                <td class="px-4 py-2 border">${order.ItemDetails || 'No details'}</td>
+                <td class="px-4 py-2 border">${order.Quantity}</td>
+                <td class="px-4 py-2 border">${order.TotalCost}</td>
+                <td class="px-4 py-2 border">${order.Status}</td>
+              </tr>
+            `);
+          });
+        });
+      }
+
+      loadOrders();
+    });
+  </script>
 </body>
 </html>

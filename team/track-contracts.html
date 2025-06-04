@@ -1,21 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Track Contracts</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contract List</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="bg-gray-50 font-sans">
-  <header class="bg-green-800 text-white py-4">
+  <header class="bg-green-800 text-white py-6">
     <div class="container mx-auto">
-      <h1 class="text-2xl font-bold">Track Contracts</h1>
+      <h1 class="text-3xl font-bold">Contract List</h1>
     </div>
   </header>
+
   <main class="container mx-auto mt-10">
-    <h2 class="text-xl font-semibold mb-4">Contract Tracking</h2>
-    <p>Track the progress and status of contracts here.</p>
-    <!-- Add content for contract tracking -->
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Contracts</h2>
+    <table class="w-full bg-white shadow-md rounded-lg border-collapse">
+      <thead>
+        <tr>
+          <th class="border px-4 py-2">Contract ID</th>
+          <th class="border px-4 py-2">Vendor Name</th>
+          <th class="border px-4 py-2">Terms</th>
+          <th class="border px-4 py-2">Start Date</th>
+          <th class="border px-4 py-2">End Date</th>
+          <th class="border px-4 py-2">Status</th>
+        </tr>
+      </thead>
+      <tbody id="contracts-body">
+        <!-- Data will be populated here -->
+      </tbody>
+    </table>
   </main>
+
+  <footer class="bg-gray-800 text-white py-6 mt-10">
+    <div class="container mx-auto text-center">
+      <p>© 2024 Vendor Management Dashboard. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    $(function() {
+      function loadContracts() {
+        $.get('http://localhost:3000/contracts', function(data) {
+          const tbody = $('#contracts-body').empty();
+          if(data.length === 0) {
+            tbody.append(`<tr><td colspan="5" class="text-center py-4">No contracts found</td></tr>`);
+            return;
+          }
+          data.forEach(contract => {
+            tbody.append(`
+              <tr>
+                <td class="border px-4 py-2">${contract.ContractID}</td>
+                <td class="border px-4 py-2">${contract.VendorName || 'N/A'}</td>
+                <td class="border px-4 py-2 whitespace-pre-line">${contract.TermsAndConditions || '—'}</td>
+                <td class="border px-4 py-2">${new Date(contract.StartDate).toLocaleDateString()}</td>
+                <td class="border px-4 py-2">${new Date(contract.EndDate).toLocaleDateString()}</td>
+                <td class="border px-4 py-2">${contract.Status}</td>
+              </tr>
+            `);
+          });
+        }).fail(() => {
+          $('#contracts-body').html(`
+            <tr><td colspan="5" class="text-center text-red-600 py-4">Failed to load contracts</td></tr>
+          `);
+        });
+      }
+
+      loadContracts();
+    });
+  </script>
 </body>
 </html>
