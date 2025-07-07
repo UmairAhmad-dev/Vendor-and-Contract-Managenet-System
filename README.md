@@ -78,8 +78,3 @@ For support, bug reports, or feature requests, please refer to the issues and di
 
 * **Feature Requests**: [Start a Discussion](https://github.com/faseey/Vendor-and-Contract-Managenet-System/discussions)
 
-## Authors
-
-* Fasih Khalil (FA23-BCS-282)
-
-* Umair Ahmad (FA23-BCS-244)
