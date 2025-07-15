@@ -225,5 +225,4 @@ VALUES
 ('manager2', 'password4', 'Manager'),
 ('amd', 'password5', 'Vendor');
 
-select * from  Users where Role = 'Manager';
-Select * from Vendors;
+
