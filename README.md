@@ -52,27 +52,27 @@ Below are some interface screenshots of the platform.
 
 ### Manager Dashboard
 Provides a high-level summary of contracts, budgets, and vendor activities.  
-![Manager Dashboard](screenshots/ManagerDashboard.png)
+![Manager Dashboard](Screenshots/ManagerDashboard.png)
 
 ### Vendor Management
 Add, evaluate, and track vendors with performance indicators.  
-![Vendor Management](screenshots/Vendormgmt.png)
+![Vendor Management](Screenshots/Vendormgmt.png)
 
 ### Contract Renewal & Status Update
 Update contract end dates and auto-switch status (Active, Renewal, Expired).  
-![Contract Renewal](screenshots/Renewcontract.png)
+![Contract Renewal](Screenshots/Renewcontract.png)
 
 ### Budget Monitoring Panel
 Track allocated vs spent budgets, avoid overspending.  
-![Budget Management](screenshots/Budgetmgmt.png)
+![Budget Management](Screenshots/Budgetmgmt.png)
 
 ### Reports Overview
 Access performance reports and contract renewal insights.  
-![Reports Generation](screenshots/Reportsgeneration.png)
+![Reports Generation](Screenshots/Reportsgeneration.png)
 
 ### Team Dashboard
 Team-level view of assignments, vendor interaction, and status updates.  
-![Team Dashboard](screenshots/TeamDashboard.png)
+![Team Dashboard](Screenshots/TeamDashboard.png)
 
 ## Getting Started
 
