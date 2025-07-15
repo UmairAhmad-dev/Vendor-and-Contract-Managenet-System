@@ -2,67 +2,85 @@
 
 > A comprehensive web-based solution designed to streamline vendor relationships, contract lifecycle management, and budget oversight with a robust Node.js backend and MySQL database.
 
-This platform is an end-to-end solution for efficient vendor and contract management, offering powerful CRUD functionalities, real-time tracking, and insightful reporting.
+## Overview
+
+This platform provides an end-to-end system for managing vendors, contracts, budgets, and purchase orders. It includes secure user access, real-time tracking, performance evaluation, and insightful reporting.
 
 ## Key Features
 
-* **Vendor Management:** Comprehensive operations for vendor registration, profiles, and performance evaluation.
-
-* **Contract Management:** Automated contract creation, renewal notifications, and status tracking.
-
-* **Purchase Order Processing:** Efficient PO generation with automated budget compliance checks.
-
-* **Budget Monitoring:** Dynamic allocation, tracking, and overspending prevention.
-
-* **User Management & Authentication:** Secure role-based access for Managers, Vendors, and Teams.
-
-* **Insightful Reporting:** Generate reports on vendor performance, contract renewals, and budget overview.
+- Vendor Management: Registration, profile updates, compliance tracking, and performance evaluation.
+- Contract Management: Manual contract creation with automated renewal status updates and expiration alerts.
+- Purchase Order Processing: PO generation linked with contracts and validated against budgets.
+- Budget Monitoring: Allocation tracking, overspending prevention, and update operations.
+- User Management & Authentication: Role-based access control for Managers, Teams, and Vendors.
+- Reporting: Generate real-time reports on vendor performance, budget status, and contracts nearing expiration.
 
 ## Technologies Used
 
-* **Backend:** Node.js, Express.js
+- Backend: Node.js, Express.js
+- Database: MySQL
+- Frontend: HTML, JavaScript, CSS
 
-* **Database:** MySQL
+## Entity Relationship Diagram (ERD)
 
-* **Frontend:** HTML, JavaScript, CSS
+Located in the `Diagrams/` folder.  
+Here is a preview:
 
-## Project Overview
-
-This system comprises a Node.js/Express.js backend for API services, a MySQL database for data persistence, and a static HTML/JavaScript frontend for user interfaces. Detailed schema and code are available in the repository.
+![ERD](Diagrams/ERD.jpeg)
 
 ## Project Structure
 
 ```
 Vendor-and-Contract-Managenet-System/
-├── node_modules/     # Node.js dependencies
-├── Diagrams/         # Contains diagrams like ERD
-├── manager/          # Frontend HTML/JS for Manager role
-├── team/             # Frontend HTML/JS for Team role
-├── vendors/          # Frontend HTML/JS for Vendor role
-├── login.html        # Main login page
-├── purchase order.html # Example of a specific HTML page
-├── server.js         # Backend Node.js/Express application
-├── vendordb.sql      # MySQL database schema and seed data
-├── package.json      # Node.js project metadata and dependencies
-├── package-lock.json # Node.js dependency lock file
-└── .gitignore        # Git ignore rules
+├── node_modules/         # Node.js dependencies
+├── Diagrams/             # Contains ERD and other system diagrams
+├── manager/              # Frontend HTML/JS for Manager role
+├── team/                 # Frontend HTML/JS for Team role
+├── vendors/              # Frontend HTML/JS for Vendor role
+├── login.html            # Main login page
+├── purchase order.html   # Purchase order form
+├── server.js             # Backend server (Express app)
+├── vendordb.sql          # MySQL schema and seed data
+├── package.json          # Project metadata and dependencies
+├── package-lock.json     # Dependency lock file
+└── .gitignore            # Files and folders ignored by Git
 ```
 
 ## Getting Started
 
-To set up and run the application:
+1. Clone the repository:
+   ```
+   git clone https://github.com/faseey/Vendor-and-Contract-Managenet-System.git
+   ```
 
-1.  Clone the repository.
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-2.  Install Node.js dependencies (`npm install`).
+3. Set up the database:
+   - Create a MySQL database named `vendordb`.
+   - Import `vendordb.sql` into your MySQL server.
 
-3.  Set up the MySQL database using the `vendordb.sql` script found in the repository.
+4. Configure database connection in `server.js`:
+   ```js
+   const db = mysql.createConnection({
+     host: 'localhost',
+     user: 'your-username',
+     password: 'your-password',
+     database: 'vendordb'
+   });
+   ```
 
-4.  Configure database connection details in `server.js`.
+5. Start the backend server:
+   ```
+   node server.js
+   ```
 
-5.  Start the backend server (`node server.js`).
-
-6.  Access the application via your web browser at `http://localhost:3000/manager`, `http://localhost:3000/team`, or `http://localhost:3000/vendor` using the provided role-based credentials.
+6. Access the application in your browser:
+   - Manager: `http://localhost:3000/manager`
+   - Team: `http://localhost:3000/team`
+   - Vendor: `http://localhost:3000/vendor`
 
 ## Contributing
 
@@ -70,11 +88,8 @@ We welcome contributions! Please fork the repository, create a feature branch, c
 
 ## Support & Contact
 
-For support, bug reports, or feature requests, please refer to the issues and discussions sections of the repository or contact us directly.
+For support, bug reports, or feature requests, contact us through the GitHub repository or directly:
 
-* **Email**: www.fasiih@gmail.com
-
-* **Bug Reports**: [Open an Issue](https://github.com/faseey/Vendor-and-Contract-Managenet-System/issues)
-
-* **Feature Requests**: [Start a Discussion](https://github.com/faseey/Vendor-and-Contract-Managenet-System/discussions)
-
+- Email: fasiih@gmail.com
+- Bug Reports: [Open an Issue](https://github.com/faseey/Vendor-and-Contract-Managenet-System/issues)
+- Feature Requests: [Start a Discussion](https://github.com/faseey/Vendor-and-Contract-Managenet-System/discussions)
