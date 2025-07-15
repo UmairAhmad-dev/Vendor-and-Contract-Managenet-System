@@ -119,5 +119,6 @@ We welcome contributions! Please fork the repository, create a feature branch, c
 For support, bug reports, or feature requests, contact us through the GitHub repository or directly:
 
 - Email: fasiih@gmail.com
+         umairahmad.dev@gmail.com
 - Bug Reports: [Open an Issue](https://github.com/faseey/Vendor-and-Contract-Managenet-System/issues)
 - Feature Requests: [Start a Discussion](https://github.com/faseey/Vendor-and-Contract-Managenet-System/discussions)
