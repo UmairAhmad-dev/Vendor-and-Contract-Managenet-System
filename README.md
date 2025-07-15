@@ -46,6 +46,34 @@ Vendor-and-Contract-Managenet-System/
 └── .gitignore            # Files and folders ignored by Git
 ```
 
+## UI Screenshots
+
+Below are some interface screenshots of the platform.
+
+### Manager Dashboard
+Provides a high-level summary of contracts, budgets, and vendor activities.  
+![Manager Dashboard](screenshots/ManagerDashboard.png)
+
+### Vendor Management
+Add, evaluate, and track vendors with performance indicators.  
+![Vendor Management](screenshots/Vendormgmt.png)
+
+### Contract Renewal & Status Update
+Update contract end dates and auto-switch status (Active, Renewal, Expired).  
+![Contract Renewal](screenshots/Renewcontract.png)
+
+### Budget Monitoring Panel
+Track allocated vs spent budgets, avoid overspending.  
+![Budget Management](screenshots/Budgetmgmt.png)
+
+### Reports Overview
+Access performance reports and contract renewal insights.  
+![Reports Generation](screenshots/Reportsgeneration.png)
+
+### Team Dashboard
+Team-level view of assignments, vendor interaction, and status updates.  
+![Team Dashboard](screenshots/TeamDashboard.png)
+
 ## Getting Started
 
 1. Clone the repository:
@@ -90,6 +118,6 @@ We welcome contributions! Please fork the repository, create a feature branch, c
 
 For support, bug reports, or feature requests, contact us through the GitHub repository or directly:
 
-- Email: www.fasiih@gmail.com
+- Email: fasiih@gmail.com
 - Bug Reports: [Open an Issue](https://github.com/faseey/Vendor-and-Contract-Managenet-System/issues)
 - Feature Requests: [Start a Discussion](https://github.com/faseey/Vendor-and-Contract-Managenet-System/discussions)
