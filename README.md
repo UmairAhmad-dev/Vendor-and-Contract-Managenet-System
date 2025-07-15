@@ -56,23 +56,23 @@ Provides a high-level summary of contracts, budgets, and vendor activities.
 
 ### Vendor Management
 Add, evaluate, and track vendors with performance indicators.  
-![Vendor Management](Screenshots/Vendormgmt.png)
+![Vendor Management](ScreenShots/Vendormgmt.png)
 
 ### Contract Renewal & Status Update
 Update contract end dates and auto-switch status (Active, Renewal, Expired).  
-![Contract Renewal](Screenshots/Renewcontract.png)
+![Contract Renewal](ScreenShots/Renewcontract.png)
 
 ### Budget Monitoring Panel
 Track allocated vs spent budgets, avoid overspending.  
-![Budget Management](Screenshots/Budgetmgmt.png)
+![Budget Management](ScreenShots/Budgetmgmt.png)
 
 ### Reports Overview
 Access performance reports and contract renewal insights.  
-![Reports Generation](Screenshots/Reportsgeneration.png)
+![Reports Generation](ScreenShots/Reportsgeneration.png)
 
 ### Team Dashboard
 Team-level view of assignments, vendor interaction, and status updates.  
-![Team Dashboard](Screenshots/TeamDashboard.png)
+![Team Dashboard](ScreenShots/TeamDashboard.png)
 
 ## Getting Started
 
