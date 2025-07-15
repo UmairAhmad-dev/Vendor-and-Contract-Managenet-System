@@ -52,7 +52,7 @@ Below are some interface screenshots of the platform.
 
 ### Manager Dashboard
 Provides a high-level summary of contracts, budgets, and vendor activities.  
-![Manager Dashboard](ScreenShots/ManagerDashboard.png)
+![Manager Dashboard](ScreenShots/Managerdashboard.png)
 
 ### Vendor Management
 Add, evaluate, and track vendors with performance indicators.  
